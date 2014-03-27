@@ -1,0 +1,8 @@
+citEntry(
+   entry="article",
+   title = "Impact of artefact removal on ChIP quality metrics in ChIP-seq and ChIP-exo data",
+   author=" Thomas Samuel Carroll and Ziwei Liang and Rafik Salama and Rory Stark and Ines de Santiago",
+   journal="Frontiers in Genetics",
+   year="in press",
+   textVersion="Thomas Samuel Carroll, Ziwei Liang, Rafik Salama, Rory Stark, Ines de Santiago: Impact of artefact removal on ChIP quality metrics in ChIP-seq and ChIP-exo data. Frontiers in Genetics, in press."
+)

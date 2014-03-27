@@ -1,0 +1,590 @@
+%\VignetteIndexEntry{Assessing ChIP-seq sample quality with ChIPQC}
+%\VignettePackage{ChIPQC}
+%\VignetteEngine{utils::Sweave}
+
+\documentclass{article}
+
+<<style, eval=TRUE, echo=FALSE, results=tex>>=
+BiocStyle::latex()
+@ 
+
+\newcommand{\reff}[1]{Figure \ref{fig:#1}}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\newcommand{\exitem}[3]{\item \texttt{\textbackslash#1\{#2\}} #3 \csname#1\endcsname{#2}.}
+\title{Assessing ChIP-seq sample quality with \Biocpkg{ChIPQC}}
+\author{Thomas Carroll and Rory Stark}
+
+\date{Edited: March 24, 2014; Compiled: \today}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+
+This vignette illustrates how to compute quality metrics for aligned data from ChIP-seq experiments using the \Biocpkg{ChIPQC} package.
+\Biocpkg{ChIPQC} will automatically compute a number of quality metrics, and provides simple ways to generate a ChIP-seq experiment quality report which can be examined to asses the absolute and relative quality of individual ChIP-seq samples (and their associated controls, as well as overall quality of the experimental data.)
+
+Two examples of ChIP-seq experiments comprising multiple samples are included in the vignette. 
+The first contains some problematic samples to demonstrate how quality issues can be detected., while the second is a complete experiment of reasonable quality.
+There is another example showing how to process a single sample.
+
+First is a summary of the minimal set of commands needed to generate a QC report using \Biocpkg{ChIPQC}.
+
+\subsection{Summary: Generating a QC report for a ChIP-seq Experiment}
+Given a sample sheet \Rcode{samples}, a report can be generated in two commands. The first constructs a \Robject{ChIPQCexperiment} object, including calculating all the QC metrics; the second (optional) step shows a quick summary of the primary QC metrics; and the third writes out a summary report that can be viewed in a browser, as follows:
+
+<<summaryExp, eval=FALSE, keep.source=TRUE>>=
+experiment = ChIPQC(samples)
+experiment
+ChIPQCreport(experiment)
+@
+
+By default, the HTML report and associated figures will be written in a sub directory named \Rcode{ChIPQCreport}, with the main html file named \Rcode{ChIPQC.html}. 
+
+An example report (corresponding to the second example below) is available for examination at \url{http://starkhome.com/ChIPQC/Reports/tamoxifen/ChIPQC.html}.
+
+\subsection{Summary: Generating a QC report for a ChIP-seq sample}
+
+QC reports can be generated for single samples. This example checks a single bam file, \Rcode{chip.bam}:
+
+<<summarySamp, eval=FALSE, keep.source=TRUE>>=
+sample = ChIPQCsample("chip.bam")
+sample
+ChIPQCreport(sample)
+@
+
+The following examples explore this in more depth.
+
+\section{Example 1: ENCODE data set with problematic samples}
+
+The first example, derived using ENCODE data for three transcription factors (\Rcode{CTCF}, \Rcode{cMYC}, and \Rcode{E2F1}) \cite{ENCODE}. Each ChIP has been performed in replicate, for a total of six samples (there are no controls in this example, see the following example for working with controls).
+
+The actual reads and peak for this experiment are not included with this vignette as they are too large.
+The sample sheet (see below) include the SRA SRR numbers for each of the experiments, so you can download reads and peaks to fully run the vignette. 
+If you do so, you should put the reads in a sub directory called \Rcode{reads} and the peaks in a sub directory called \Rcode{peaks}. 
+We intend to make all the vignette data more easily obtainable; email the package authors if you are interested.
+
+\subsection{Experiment sample sheet}
+The first step is to construct a sample sheet describing the ChIP-seq experiment. This can be passed as a data frame, or saved in a csv file. 
+The experiment can also be represented by a \Robject{DBA} object constructed using the \Biocpkg{DiffBind} package, which accepts the same sample sheets as \Biocpkg{ChIPQC}.
+A csv sample sheet has been included for this data set, and can be accessed as follow:
+
+<<ex1Samples, eval=TRUE, keep.source=TRUE>>=
+library(ChIPQC)
+samples = read.csv(file.path(system.file("extdata", package="ChIPQC"),
+                                         "example_QCexperiment.csv"))
+samples
+@
+This sample sheet details the metadata for the experiment. It also contains file paths to the aligned reads and previously called peaks.
+Note that if you have the sample sheet in a .csv file, you do not have to first load it into a data frame -- the filename can be passed directly to \Rfunction{ChIPQC}.
+
+\subsection{Constructing a \Robject{ChIPQCexperiment} object}
+
+The main entry point for assessing experiments is \Rfunction{ChIPQC}. 
+This takes a sample sheet and some other optional parameters and computes quality metrics for each of the individual samples. 
+It does this using the \Biocpkg{BiocParallel} package, which by default will run in parallel, using all available cores on your machine.
+For each unique sample (including controls), a \Robject{ChIPQCsample} object us constructed and added to a list. This list of samples forms the core of the \Robject{ChIPQCexperiment} object, which is constructed and returned by \Rfunction{ChIPQC}.
+
+The parameters for \Rfunction{ChIPQC} include an \Rcode{annotation} indicating what assembly of what genome is being analyzed.
+NB: currently, only "hg19" is supported, with more to follow.
+The \Rcode{chromosomes} parameter specifies which chromosomes to examine when computing quality metrics.
+Restricting the chromosomes analysed can greatly increase the speed of the computations, as well as reducing the size of the resulting \Robject{ChIPQCexperiment} object.
+For this example we will limit the analysis to chromosome 18, the only chromosome for which data is included.
+
+Other parameters include \Rcode{mapQCth}, which represents a threshold for filtering on mapping (alignment) quality, which is set to \Rcode{15} by default. 
+An optional \Rcode{blacklist} is a file or \Robject{GRanges} object with genomic intervals whereby reads in those regions will also be filtered out. 
+Use of blacklists can be very important in ChIP-seq data processing (\cite{Blacklist}), and should be applied for peak calling as well.
+
+For this example, the main experiment is analyzed as follows:
+
+<<ex1Construct, eval=FALSE, keep.source=TRUE>>=
+
+exampleExp = ChIPQC(samples)
+exampleExp
+@
+
+By default, the "hg19" annotation will be used with a default blacklist, and only the first chromosome (in this case "chr22") will be examined.
+
+For the purposes of this vignette, we can load a pre-computed version of this object:
+
+<<ex1Load, eval=TRUE, keep.source=TRUE>>=
+data(example_QCexperiment)
+exampleExp
+@
+
+\subsection{Quality metrics summary}
+Looking at the output, the first line indicates how many samples there are. 
+The next section shows the metadata for the six ChIP samples (cell line, transcription factor ChIP'ed, replicate number, and number of peaks called).
+
+The final section (also retrievable as a \Rclass{matrix} by calling \Rcode{QCmetrics(exampleExp)}) shows a summary of the main QC metrics. 
+These include the total number of reads in the bam file for each sample, the percentage of these that were successfully mapped (aligned), and the percentage of reads having a mapping quality score less than or equal to the \Rcode{mapQCth} (in this case, 15). 
+The percentage of reads that map to the exact position in the genome as at least one other read is then reported. 
+In this example, we can see substantial variance in the duplication rates, although none are extremely high.
+Indeed, good quality ChIPs for narrowly binding transcriptions factors are expected to have regions of very high enrichment, which will correctly include fragments that originate at the same location.
+Sequencing of such "duplicate" fragments is expected and biologically meaningful where the factor binds with high affinity.
+The extremely low duplication rates for the \Rcode{E2F1} samples are flags of potential problems with these ChIPs.
+
+Next the read length, derived from the data in the bam files, is reported, along with the estimated mean fragment length. 
+The fragment length is estimated by methods implemented in the \Biocpkg{chipseq} package by systematically shifting the reads on each strand towards each other until the minimum genome coverage is achieved.
+The \Rcode{RelativeCC} metric is calculated by comparing the maximum cross coverage peak (at the shift size corresponding to the fragment length) to the cross coverage at a shift size corresponding to the read length, with higher scores (generally 1 or greater) indicating good enrichment.
+In this example, the \Rcode{RelativeCC} score for the all CTCF samplesis greater than 1, indicating these samples are of high quality.
+
+The SSD score, as implemented in \Biocpkg{htSeqTools}, is another indication of evidence of enrichment.
+It is computed by looking at the standard deviation of signal pile-up along the genome normalised to the total number of reads.
+An enriched sample typically has regions of significant pile-up so a higher SSD is more indicative of better enrichment.
+SSD scores are dependent on the degree of total genome wide signal pile-up and so are sensitive to regions of high signal found with Blacklisted regions as well as genuine ChIP enrichment. Here the first CTCF replicate shows the highest SSD score and so greatest enrichment for depth of signal.
+
+
+The final two metrics report the percentage of reads in different regions of interest. 
+The first reports the percentage of reads that overlap called  peaks (also known as FRIP). This is another good indication of how "enriched" the sample is, and can be considered a "signal-to-noise" measure of what proportion of the library consists of fragments from binding sites vs. background reads.
+RiP\% values for ChIPs around 5\% or higher generally reflect successful enrichment.
+
+The final measure reports the percentage of reads that overlapped blacklisted regions (RiBL). The signal from blacklisted has been shown to contribute to confound peak callers and fragment length estimation as well as contribute to the read length peak in cross coverage and cross correlation read length peak (\cite{CRUK}). The RiBL score then may act as a guide for the level of background signal in a ChIP or input and is found to be correlated with SSD in input samples and the read length cross coverage score in both input and ChIP samples (\cite{CRUK}).
+
+\subsection{Generating a summary QC report for experimental sample groups}
+
+The easiest way to get a visual overview of the QC metrics for the experiment is to generate a summary HTML report. 
+This is accomplished by calling the \Rfunction{ChIPQCreport} method:
+<<ex1Report, eval=FALSE, keep.source=TRUE>>=
+ChIPQCreport(exampleExp)
+@
+
+By default, a sub directory will be created named \Rcode{ChIPQCreport} (this is configurable using the \Rcode{reportFolder} parameter), which will contain each of the plots.
+The main interactive HTML page (built using the R package \Rpackage{Nozzle}) is named \Rcode{ChIPQC.html} by default.
+This can be loaded into a browser.
+This report is available at \url{http://starkhome.com/ChIPQC/Reports/exampleExp/ChIPQC.html}. 
+% An image of the report for the example data set is shown in \reff{exp1_report1} - \reff{exp1_report5}.
+% 
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=14cm]{ChIPQC_Report1.pdf}
+%   \caption{First page of \Biocpkg{ChIPQC} Summary report. Generated by: \Rcode{ChIPQCreport(exampleExp)}.}
+%   \label{fig:exp1_report1}
+% \end{figure}
+% 
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=14cm]{ChIPQC_Report2.pdf}
+%   \caption{Second page of \Biocpkg{ChIPQC} Summary report. Generated by: \Rcode{ChIPQCreport(exampleExp)}.}
+%   \label{fig:exp1_report2}
+% \end{figure}
+% 
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=14cm]{ChIPQC_Report3.pdf}
+%   \caption{Third page of \Biocpkg{ChIPQC} Summary report. Generated by: \Rcode{ChIPQCreport(exampleExp)}.}
+%   \label{fig:exp1_report3}
+% \end{figure}
+% 
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=14cm]{ChIPQC_Report4.pdf}
+%   \caption{Fourth page of \Biocpkg{ChIPQC} Summary report. Generated by: \Rcode{ChIPQCreport(exampleExp)}.}
+%   \label{fig:exp1_report4}
+% \end{figure}
+% 
+% \begin{figure}
+%   \centering
+%   \includegraphics[width=14cm]{ChIPQC_Report5.pdf}
+%   \caption{Fifth page of \Biocpkg{ChIPQC} Summary report. Generated by: \Rcode{ChIPQCreport(exampleExp)}.}
+%   \label{fig:exp1_report5}
+% \end{figure}
+
+The report is interactive in several ways.
+The individual sections can be expanded or compressed to focus in on specific areas of the assessment.
+Table can be sorted by clicking on the column labels.
+Individual plots can be enlarged or shrunk by clicking on them.
+
+\subsubsection{Report: Overview}
+The first section include a textual overview of the report contents.
+
+\subsubsection{Report: QC Summary table}
+The second section, \emph{QC Summary}, contains a table with the key QC metrics for each sample, similar to the table output by \Rfunction{QCmetrics}.
+
+\subsubsection{Report: QC Results plots}
+The third section contains the plots themselves, divided into three sections. Samples are grouped together using the experimental metadata; by default, samples sharing the same \Rcode{Tissue} and \Rcode{Factor} values are considered sample groups (this is controllable by the user using the \Rcode{facetBy} parameter with \Rcode{ChIPQCreport()} function).
+
+The first section, \emph{Mapping, Filtering, and Duplication Rate}, focuses on read mapping. begins with a table showing how the sequencing reads can be filtered: how many are mappable (align to a position in the genome) and how many reads pass the mapping quality filter and are not duplicates. Also included are the overall duplication rate for each sample, the percentage that pass the mapping quality filter, and the percentage of total reads that pass both the mapping quality filter and are not duplicates. Next is a plot showing the effect of blacklisting, with the proportion of reads that do and do not overlap with blacklisted regions. The final plot in this section  uses the genomic annotation to show where reads map in terms of genomic features. 
+This is represented as a heatmap showing the enrichment of reads compared to the background levels of the feature.
+
+The second section, \emph{ChIP Signal Distribution and Structure}, looks at the inherent "peakiness" of the samples. The first plot is a coverage histogram.
+The X-axis represent the read pileup height at a basepair position, and the Y-axis represents how many positions have this pileup height. This is on a log scale. A ChIP sample with good enrichment should have a reasonable "tail".
+This can be captured using the \emph{SSD} metric, which is the standard deviation of this histogram (normalized to library depth so as to allow for sample-to-sample comparisons.)
+Samples with low enrichment, consisting of mostly background reads and genome wide low pile-up (such as in controls), should have lower SSD values than efficient ChIPs. Equivalence between ChIP and control samples may reflect either low enrichment for ChIP or, when SSD is high for controls, the presense of large regions of high depth, aberrant signal in control samples and hence a flag for further blacklisting of genomic regions.
+
+The other plot in this section show the cross-coverage scores (\emph{CC Score}) of reads along the two strands at a range of successive shifts. There is usually a  distinctive peak around the read length and a second peak should be at the expected fragment length. The read length peak is excluded from identification of the the shift with maximum cross coverage score, region of exclusion shown in red, to allow for the prediction of sensible fragment length scores. Failure to show a clear peak at the fragment length is indicative of a non-enriched sample. This can be seen in the \emph{Relative CC} metric, which is the maximum CC Score (estimated fragment size) divided by the read length CC Score; low values tend to indicate a lack of enrichment.
+
+In this example, both these plots suggest that the CTCF sample group is more enriched than the other two sets of samples, with the first replicate showing particularly high enrichment. The coverage histogram stays higher above the X-axis for the CTCF samples. Likewise, the CTCF samples show a clear peak at the fragment length in the cross-coverage plot, while the other samples do not show a clear peak other than at the read length.
+
+The final set of plots, \emph{Peak Profile and ChIP Enrichment}, are based on metric computed using the supplied peaks if available. The first plot shows average peak profiles, centered on the summit (point of highest pileup) for each peak.
+These profiles can vary depending on what type of mark is being studied -- transcription factor, histone mark, or other DNA-binding protein such as a polymerase -- but similar marks usually have a distinctive profile in successful ChIPs.
+
+Next is a bar chart of the Reads in Peaks. ChIP samples with good enrichment will have a higher proportion of their reads overlapping called peaks.The final plot shows these data in a different way, offering a box plot of the distribution of how many reads are in each peak.
+
+Finally, plots showing how the sample cluster are presented. The correlation heatmap is based on correlations values for all the peak scores for each sample. The other plot shows the first two principal component values for each sample. In this example, the replicates do cluster by replicate, which is a positive sign. the \Rcode{CTCF} replicates are highly correlated and form their own cluster. The \Rcode{E2F1} replicates are also highly correlated with each other, and anti-correlated with the \Rcode{CTCF} samples, probably due to their being from different cell lines.
+
+\subsubsection{Report: Files and Versions}
+
+The final section of the report gives some version details as to the software run.
+
+
+
+\section{Example 2: ER binding in tamoxifen resistant data set}
+
+The next example demonstrates the use of \Biocpkg{ChIPQC} with  a larger experiment with good overall quality. This includes 11 ChIPs for the transcription factor ER in five cell lines, with at least two replicates for each ChIP, as well as 5 associated input DNA controls (one for each cell line). This data set is derived from \cite{RossInnes}. 
+The example only includes data from chromosome 18 (chr18) for time and space reasons. 
+The actual aligned reads for the samples, in the form of BAM files, are not included with the package as they are approximately 200MB. 
+The peaks (called using MACS \cite{MACS}) are also not included.
+To run all aspects of the vignette, you will need to download these separately -- inquire of the package maintainers if you are interested in how to do this. 
+Note that this data set is the same at that used for the vignette and example for the \Biocpkg{DiffBind} package, which provides tools for further analyzing ChIP-seq experiments.
+
+\subsection{Experimental sample sheet}
+The first step is to construct a sample sheet describing the ChIP-seq experiment. This can be passed as a data frame, or saved in a csv file. 
+The experiment can also be represented by a \Robject{DBA} object constructed using the \Biocpkg{DiffBind} package, which accepts the same sample sheets as \Biocpkg{ChIPQC}.
+A csv sample sheet has been included for the tamoxifen data set, and can be accessed as follow:
+
+<<tamSamples, eval=TRUE, keep.source=TRUE>>=
+library(ChIPQC)
+samples = read.csv(file.path(system.file("extdata", package="ChIPQC"),
+                                         "tamoxifenQC.csv"))
+samples
+@
+This sample sheet details the metadata for the experiment, including how controls are matches with ChIP samples. It also contains file paths to the aligned reads and previously called peaks. 
+Note that in this case the paths are relative to the current working directory. 
+If you download the associated data to run all step of the vignette, you will need to unzip the "reads" and "peaks" directories as sub directories of where the sample sheet is.
+
+If you have the sample sheet in a .csv file, you do not have to first load it into a data frame -- the filename can be passed directly to \Rfunction{ChIPQC}.
+
+\subsection{Constructing a \Robject{ChIPQCexperiment} object}
+
+The main entry point for assessing experiments is \Rfunction{ChIPQC}. 
+This takes a sample sheet and some other optional parameters and computes quality metrics for each of the individual samples. 
+It does this using the \Biocpkg{BiocParallel} package, which by default will run in parallel, using all available cores on your machine.
+For each unique sample (including controls), a \Robject{ChIPQCsample} object us constructed and added to a list. This list of samples forms the core of the \Robject{ChIPQCexperiment} object, which is constructed and returned by \Rfunction{ChIPQC}.
+
+The parameters for \Rfunction{ChIPQC} include an \Rcode{annotation} indicating what assembly of what genome is being analyzed.
+NB: currently, only "hg19" is supported, with more to follow.
+The \Rcode{chromosomes} parameter specifies which chromosomes to examine when computing quality metrics.
+Restricting the chromosomes analysed can greatly increase the speed of the computations, as well as reducing the size of the resulting \Robject{ChIPQCexperiment} object.
+For this example we will limit the analysis to chromosome 18, the only chromosome for which data is included.
+
+Other parameters include \Rcode{mapQCth}, which represents a threshold for filtering on mapping (alignment) quality, which is set to \Rcode{15} by default. 
+An optional \Rcode{blacklist} is a file or \Robject{GRanges} object with genomic intervals whereby reads in those regions will also be filtered out. 
+Use of blacklists can be very important in ChIP-seq data processing (\cite{Blacklist}), and should be applied for peak calling as well.
+
+For this example, some other features of \Rfunction{ChIPQC} are used as well. By setting \Rcode{consensus=TRUE}, a consensus peak set will be derived,so that even the control samples can be compared to determine their relative enrichment in these regions. With \Rcode{bCounts=TRUE}, the peak scores will be computed by counting how many reads overlap these regions for every sample (include controls). 
+This feature relies on the \Rfunction{dba.count} of the \Biocpkg{DiffBind} package. By passing an extra parameter, \Rcode{summits=250}, through to \Rfunction{dba.count}, the peaks will include 250 basepairs upstream and downstream of the peak summit. 
+
+<<tamConstruct, eval=FALSE, keep.source=TRUE>>=
+data(blacklist_hg19)
+tamoxifen = ChIPQC(samples, consensus=TRUE, bCount=T, summits=250,
+                   annotation="hg19", chromosomes="chr18",
+                   blacklist = blacklist.hg19)
+tamoxifen
+@
+Note that only the sample sheet actually needed to be specified; by default, if the \Rcode{annotation} parameter is missing, it will default to "hg19", while a missing \Rcode{chromosomes} parameter will result in the first chromosome that has peak being examined (in this case there re only peaks for "chr18", so that would be the default), and if the "hg19" is used, and the blacklist is missing, it will default to the one supplied with the package.
+
+For the purposes of this vignette, we can load a pre-computed version of this object:
+
+<<tamLoad, eval=TRUE, keep.source=TRUE>>=
+data(tamoxifen_QC)
+tamoxifen
+@
+
+\subsection{Quality metrics summary}
+
+Looking at the output, the first line indicates how many samples there are (16, including 11 ChIPs and 5 controls). 
+The next section shows the metadata for the 11 ChIP samples. All samples have the same number of peaks as a consensus set (derived from merging overlapping peaks, and keeping peaks that were identified in at least two samples) was used.
+
+The final section (also retrievable as a \Rclass{matrix} by calling \Rcode{QCmetrics(tamoxifen)}) shows a summary of the main QC metrics. 
+These include the total number of reads in the bam file for each sample, the percentage of these that were successfully mapped (aligned), and the percentage of reads that were filtered out due to having a mapping quality score less than or equal to the \Rcode{mapQCth} (in this case, 15). 
+The percentage of reads that map to the exact position in the genome as at least one other read is then reported. 
+In this example, we can see that three of the controls have very low duplication rates, with the \Rcode{T47D} and \Rcode{ZR75} having duplication rates above 20\%. This suggest it owuld be reasonable to filter duplciates from those two control. The ChIPs show substantial variance in their duplication rates, several above 10\%. Higher duplication rates are expected in the ChIPs, as they should have regions of very high enrichment, which will correctly include fragments that originate at the same location.
+This is why we expect to see the controls samples exhibiting lower duplication rates (<5\%) with the ChIP samples having higher rates (15\%-20\%), but not too high (>50\%).
+A very high duplication rate (>50\%) can result from a sample that has been biased by uneven PCR duplication of some fragments.
+This example shows some variance in duplication rates amongst the samples, including between replicates of the same condition.
+For example the third \Rcode{MCF7} replicate has a duplication rate double that of the first replicat (although neither rate is so high as to indicate a massive PCR duplication issue). The second replicate has a very low rate, which should draw our attention to other metrics that indicate peak enrichment, such as SSD, Retlative CC, and the peak profile plot. 
+
+Next the read length, derived from the data in the bam files, is reported, along with the estimated mean fragment length. 
+The fragment length is estimated from the data by systematically shifting the reads on each strand towards each other until the highest degree of cross-correlation is obtained.
+The \Rcode{RelativeCC} metric is calculated by comparing the maximal cross correlation peak (at the shift size corresponding to he fragment length) to the cross correlation at a shift size corresponding to the read length, with higher scores (generally 2 or greater) indicating good enrichment.
+In this example, the \Rcode{RelativeCC} scores for the controls are very low, as expected, while the scores for the ChIPs are all greater than 1.5, with most above 2, indicating good enrichment and reliable fragment length estimation.
+
+The SSD value is another indication of evidence of enrichment.
+It is computed by looking at the density of positions with different pileup values.
+An enriched sample typically has a range of pileup values, with a high standard deviation, so a higher SSD is more indicative of better enrichment.
+SSD values close to 1 are generally correlated of poorly enriched samples, while successful ChIPs can expect values around 1.5, with highly enriched samples having SSD values of 2 or higher. 
+In this example, the \Rcode{RelativeCC} scores for the ChIPs are greater than 1.5, with several above 2, while most of the controls are closer to 1, indicating background sampling without clear peaks where reads along the two strands converge in peaks. The two controls with high duplication rates also have high SSD scores, probably driven by false peaks driven by PCR duplication. Several of the plots below, such as the coverage histogram, cross-coverage,a nd peak profiles show that the signals for these controls do not show meaningful enrichment when duplicates are removed.
+
+The final two metrics report the percentage of reads in different regions of interest. 
+The first reports the percentage of reads that overlap called  peaks (also known as FRIP). This is another good indication of how "enriched" the sample is, and can be considered a "signal-to-noise" measure of what proportion of the library consists of fragments from binding sites vs. background reads.
+RiP\% values for ChIPs around 15\% or higher generally reflect successful enrichment. In this case,where a consensus peak set was used (instead of peak sets unique to each sample), samples that originally had fewer peaks called can be expected to have lower RiP values (for example the \Rcode{T47D} samples). Use of the consensus set does allow enrichment in the controls to be directly compared; in this example, the controls have much lower RiP\% values, indicating that most of the the fragment sequenced in them were not located at peak sites.
+
+The final measure report the percentage of reads that overlapped blacklisted regions (RiBL).
+
+\subsection{Generating a summary HTML report}
+
+As in the previous example, a summary HTML report can be generated for this example experiment by invoking \Rfunction{ChIPQCreport}.
+The only difference is that, in this case, the sample groups should be derived using the \Rcode{Tissue} and \Rcode{Condition} metadata values, as follows:
+
+<<tam1Report, eval=FALSE, keep.source=TRUE>>=
+ChIPQCreport(tamoxifen,facetBy=c("Tissue","Condition"))
+@
+
+The resulting report is not included in this vignette due to space limitations, but you are invited to generate it yourself and have a look. It is also available for examination at \url{http://starkhome.com/ChIPQC/Reports/tamoxifen/ChIPQC.html}.
+
+\subsection{Plotting QC metrics for experimental sample groups}
+
+As an alternative to generating a complete summary report, plotting methods are provided to generate specific plots, as follows:
+
+\subsubsection{Plotting Coverage Histograms}
+
+The coverage histogram plot is generated as follows:
+
+<<figCoverageHist, fig=TRUE, include=FALSE, width=9, height=6 >>=
+plotCoverageHist(tamoxifen,facetBy=c("Tissue","Condition"))
+@
+\incfig{ChIPQC-figCoverageHist}{.66\textwidth}{Example Coverage Histogram plot.}
+  {Generated by \Rcode{plotCoverageHist(tamoxifen,facetBy=c("Tissue","Condition"))}}
+
+As shown in Figure~\ref{ChIPQC-figCoverageHist}, this plots the distribution of pileup values at each basepair. The first thing to looks for is that the controls are "below" the ChIPs in the plots. 
+Enriched ChIP samples will tail off less quickly than input controls consisting of background reads, indicating positions with high pileup values (ultimately corresponding to peaks).
+
+\subsubsection{Plotting Cross-Coverage}
+
+A cross-coverage plot can be generated as follows:
+<<figCC, fig=TRUE, include=FALSE, width=9, height=6 >>=
+plotCC(tamoxifen,facetBy=c("Tissue","Condition"))
+@
+\incfig{ChIPQC-figCC}{.66\textwidth}{Example Cross-correlation plot.}
+  {Generated by \Rcode{plotCC(tamoxifen,facetBy=c("Tissue","Condition"))}}
+  
+As shown in Figure~\ref{ChIPQC-figCC}, this plots the cross-correlation values over a range of shift sizes. The region up to the read length is highlighted, and a small peak in cross-correlation is expected to be found here. Notice that the controls do not have another higher peak, while ChIP samples with good enrichment have another peak in cross-correlation value at the fragment length, as shifting the reads on both strand should increase correlation at peak sites.
+
+\subsubsection{Plotting Relative Enrichment of reads in Genomic Intervals}
+
+A heatmap plot showing relative enrichment of reads around annotated genomic features can be generated as follows:
+
+<<figRegi, fig=TRUE, include=FALSE, width=9, height=9 >>=
+plotRegi(tamoxifen,facetBy=c("Tissue","Condition"))
+@
+\incfig{ChIPQC-figRegi}{.66\textwidth}{Example Relative Enrichment of Genomic features heatmap plot.}
+  {Generated by \Rcode{plotRegi(tamoxifen,facetBy=c("Tissue","Condition"))}}
+  
+As shown in Figure~\ref{ChIPQC-figRegi}, samples with more reads than expected around certain features can be seen. Note that these genomic features tend to be enriched (and background genomic DNA depleted) in ChIP and control samples, as it is more likely that the chromatin is open near coding genes, and hence fragmentation can occur there more frequently.
+
+\subsubsection{Plotting Peak Profiles}
+
+Plots of composite peak profile can be generated as follows:
+
+<<figPeakProfile, fig=TRUE, include=FALSE, width=9, height=6 >>=
+plotPeakProfile(tamoxifen,facetBy=c("Tissue","Condition"))
+@
+\incfig{ChIPQC-figPeakProfile}{.66\textwidth}{Example Peak Profile plot.}
+  {Generated by \Rcode{plotPeakProfile(tamoxifen,facetBy=c("Tissue","Condition"))}}
+
+As shown in Figure~\ref{ChIPQC-figPeakProfile}, each peak is centered on its summit (point of highest pileup after extending the reads to the calculated fragment length), and the pileup values 
+at bases in a window upstream and downstream of the summits is computed and averaged for all peaks in the sample. Good ChIPs will show distinctive patterns of enrichment in these peaks, while associated controls will be relatively flat. The exact shape depends on the specific protein being ChIPed and the biological conditions. This example shows a profile for a transcription factor binding directly to the DNA.
+
+\subsubsection{Plotting Reads overlapping Peaks and the Blacklist}
+ 
+Barplots of the relative number of reads that overlap peaks vs. background reads, as well and the proportion of reads overlapping blacklisted regions, can be generated as follows: 
+
+<<figRap, fig=TRUE, include=FALSE, width=7, height=5 >>=
+plotRap(tamoxifen,facetBy=c("Tissue","Condition"))
+@
+\incfig{ChIPQC-figRap}{.66\textwidth}{Example Reads overlapping Peaks plots.}
+  {Generated by \Rcode{plotRap(tamoxifen,facetBy=c("Tissue","Condition"))}}
+
+<<figFribl, fig=TRUE, include=FALSE, width=9, height=6 >>=
+plotFribl(tamoxifen,facetBy=c("Tissue","Condition"))
+@
+\incfig{ChIPQC-figFribl}{.66\textwidth}{Example Reads overlapping Blacklist plots.}
+  {Generated by \Rcode{plotFribl(tamoxifen,facetBy=c("Tissue","Condition"))}}
+
+These plots are shown for the example data set in Figures \ref{ChIPQC-figRap}.
+ and \ref{ChIPQC-figFribl}.
+
+\subsubsection{Plotting Sample Clustering}
+
+It can be useful when assessing the overall success of an experiment to see how the samples cluster. Two plots to aid in this can be generated as follows:
+
+<<figCorHeatmap, fig=TRUE, include=FALSE, width=10, height=10 >>=
+plotCorHeatmap(tamoxifen,attributes=c("Tissue","Factor","Condition","Replicate"))
+@
+\incfig{ChIPQC-figCorHeatmap}{.66\textwidth}{Example Correlation Heatmap with Clustering.}
+  {Generated by \Rcode{plotCorHeatmap(tamoxifen,attributes=c("Tissue","Condition"))}}
+<<figPrincomp, fig=TRUE, include=FALSE, width=8, height=8 >>=
+plotPrincomp(tamoxifen,attributes=c("Tissue","Condition"))
+@
+\incfig{ChIPQC-figPrincomp}{.66\textwidth}{Example Principal Components plot.}
+  {Generated by \Rcode{plotPrincomp(tamoxifen,attributes=c("Tissue","Condition"))}}
+
+Figure~\ref{ChIPQC-figCorHeatmap} shows the clustering in a correlation heatmap, where the scores for every peak are computed for each sample, and then scores for each pair of samples are used to calculate a correlation value. In this example, the controls form a distinct cluster, while the replicates each cluster together. 
+
+Additional insight can be gained from viewing the results of a principal components analysis using the peak scores. Figure~\ref{ChIPQC-figPrincomp} plots each sample along the first two components. 
+The replicates, each plotted with the same color, mostly plot close to each other. 
+The two controls, with very low peak scores (as evidenced by their low RiP\% values), end up in almost the exact same point (with the yellow dot superimposed over a red dot) along the first component to the right, while the \Rcode{T47D} samples, which are the least enriched of the ChIPs (lower RiP\%), separate in the second component, occupying the top portion (green dots).
+
+\section{Example 3: Single sample assessment}
+
+While the vignette has focused on using \Biocpkg{ChIPQC} to assess experiment consisting of multiple ChIP and control samples, it can also be used to examine samples individually without requiring the full experimental structure. This section briefly describes how to work with individual samples.
+
+\subsection{Constructing a \Robject{ChIPQsample} object and retrieving QC metrics}
+
+Given only a bam file (or a set of aligned reads in a \Rclass{GappedAlignemnt} object), the QC metrics can be easily calculated (note the peak file is optional, but if missing, no peak-related metrics can be calculated):
+
+<<sampConstruct, eval=FALSE, keep.source=TRUE>>=
+CTCF1 = ChIPQCsample("reads/SRR568129.bam", peaks="peaks/SRR568129_chr22_peaks.bed")
+@
+
+As the source data is not included with this vignette, the same effect can be simulated by retrieving the sample object we would have generated from the example experiment:
+
+<<sampLoad, eval=TRUE, keep.source=TRUE>>=
+CTCF1 = QCsample(exampleExp,1)
+@
+
+This returns a \Rclass{ChIPQCsample} object, that can be examined as follows:
+
+<<sampShow, eval=TRUE, keep.source=TRUE>>=
+CTCF1
+@
+
+This shows some summary statistics and the \Rclass{GRanges} object containing the examined peaks.
+
+A simpler way to see the key QC metrics is as follows:
+<<sampMetrics, eval=TRUE, keep.source=TRUE>>=
+QCmetrics(CTCF1)
+@
+
+tamThis returns a \Rclass{vector} containing 10 metrics: the total number of reads in the bam file, the percentage that are aligned to the genome, the percentage that fall below the default mapping quality filter score of 15, the percentage of reads that align to exactly the same starting position as another read, the length of reads, the calculated fragment length, the relative cross-correlation score (based on the cross-correlation score when shifting by the fragment length vs. unshifted), the SSD (based on the standard deviation of the distribution of coverage pileup scores), and the percentage of reads that overlap peaks and blacklisted regions.
+
+\subsection{Plotting QC metrics for a sample}
+
+Plots can be generated for individual samples. For example, here is the cross-correlation plot:
+<<figSampCC, fig=TRUE, include=FALSE, width=10, height=10 >>=
+plotCC(CTCF1)
+@
+\incfig{ChIPQC-figSampCC}{.66\textwidth}{Sample-level cross-correlation plot.}
+  {Generated by \Rcode{figSampCC(CTCF)}}
+shown as Figure~\ref{ChIPQC-figSampCC}
+
+\subsection{Combining multiple samples into an Experiment}
+
+Samples that have been analyzed separately as \Rclass{ChIPQCsample} objects may be combined into an \Rclass{ChIPQCexperiment} object, without requiring the QC metrics to be re-computed, by combining them with a list and supplying a sample sheet with the experimental metadata.
+
+For example, suppose the samples in the tamoxifen resistance example had been assessed separately and been combined in a list. We can get equivalent of this using the \Rfunction{QCsample} method on the experiment:
+
+<<sampList, eval=TRUE, keep.source=TRUE>>=
+sampleList = QCsample(tamoxifen)
+class(sampleList)
+length(sampleList)
+names(sampleList)
+class(sampleList[[1]])
+@
+
+Suppose we also have constructed a matching samplesheet as a \Rclass{data.frame}:
+
+<<sampSheet, eval=TRUE, keep.source=TRUE>>=
+sampleSheet = read.csv(file.path(system.file("extdata", package="ChIPQC"),
+                                         "tamoxifenQC.csv"))
+sampleSheet
+@
+
+we can then re-construct the original \Rclass{ChIPQCexperiment} object without having to re-compute the QC metrics:
+
+<<sampExp, eval=FALSE, keep.source=TRUE>>=
+tamoxifen = ChIPQC(sampleSheet, samples=sampleList)
+tamoxifen
+@
+
+We could also supply a sample sheet that refers to only a subset of the \Rclass{ChIPQCsample} objects to form a smaller experiment:
+
+<<sampExp2, eval=FALSE, keep.source=TRUE>>=
+BT474s = ChIPQC(sampleSheet[1:2,], samples=sampleList)
+@
+
+\section{Customising QC plots}
+
+\Biocpkg{ChIPQC} allows for some customisation of plots produced by the use of the additional parameters of \Rcode{facetBy}, \Rcode{colourBy} and \Rcode{lineBy}. 
+\Rcode{facetBy} accepts a character vector corresponding to metadata column names and will group plots according to those supplied.
+In this example we choose to group by sample names to produce individual plots per sample  (Figure~\ref{ChIPQC-figCCBySample}).
+
+
+<<figCCBySample, fig=TRUE, include=FALSE, width=9, height=6 >>=
+plotCC(exampleExp,facetBy="Sample")
+@
+\incfig{ChIPQC-figCCBySample}{.66\textwidth}{Cross-correlation plot grouped by Sample ID.}
+  {Generated by \Rcode{plotCC(exampleExp,facetBy="Sample")}}
+  
+
+We can also use the \Rcode{colourBy} and \Rcode{lineBy} parameters for the \Rcode{plotCoverageHist()}, \Rcode{plotPeakProfile()} and \Rcode{plotCC()} functions to alter line colours and types used. 
+In Figure~\ref{ChIPQC-figCCColourByFlineByTissue}) we colour by factor and set the line type to be by Tissue.
+<<figCCColourByFlineByTissue, fig=TRUE, include=FALSE, width=9, height=6 >>=
+plotCC(exampleExp,facetBy="Sample",colourBy="Factor",lineBy="Tissue")
+@
+\incfig{ChIPQC-figCCColourByFlineByTissue}{.66\textwidth}{Cross-correlation plot grouped by Sample ID.}
+  {Generated by \Rcode{plotCC(exampleExp,facetBy="Sample",colourBy="Factor",lineBy="Tissue")}}
+  
+
+
+In addition to these options, extra metadata information can be passed to the plotting functions and this used by \Rcode{colourBy}, \Rcode{lineBy} and \Rcode{facetBy}.
+We illustrate this by showing thr relationship between SSD and cross-coverage scores by supplying the \Rcode{QCmetrics} as additional metadata using the \Rcode{addMetaData} parameter.
+
+<<extraMetadata, eval=TRUE, keep.source=TRUE>>=
+
+extraMetadata <- data.frame(Sample = rownames(QCmetrics(exampleExp)),
+FRiBL = QCmetrics(exampleExp)[,("RiBL%")],
+SSD =QCmetrics(exampleExp)[,("SSD")]
+)
+@
+<<figCCaddMetadata, fig=TRUE, include=FALSE, width=9, height=6 >>=
+plotCC(exampleExp,facetBy="Sample",lineBy="Tissue",addMetaData=extraMetadata,colourBy="SSD")
+
+@
+\incfig{ChIPQC-figCCaddMetadata}{.66\textwidth}{Cross-correlation plot grouped by Sample ID.}
+  {Generated by \Rcode{plotCC(exampleExp,facetBy="Sample",lineBy="Tissue",addMetaData=extraMetadata,colourBy="SSD")}}
+
+
+\Biocpkg{ChIPQC} uses the \Biocpkg{ggplot2} framework to make plots and the resulting \Robject{gg} object can be further customised after the production of the plot. Additional \Biocpkg{ggplot2} aesthetics can be added and this instance we change the colour scale used.
+
+<<extraMetadataGGextra, eval=FALSE, keep.source=TRUE>>=
+
+plotCC(exampleExp,facetBy="Sample",lineBy="Tissue",addMetaData=extraMetadata,colourBy="SSD")
++ scale_color_gradient2(high="red",mid="black",low="white",midpoint=1.5)
+@
+
+
+\section{Using \Biocpkg{ChIPQC} and \Biocpkg{DiffBind} together}
+
+\Biocpkg{ChIPQC} and \Biocpkg{DiffBind} are both packages that help manage and analyze ChIP-seq experiments, and are designed to be used together.
+
+If you already have a project in \Biocpkg{DiffBind}, the main constructor \Rfunction{ChIPQC} can accept a \Rclass{DBA} object in place of the sample sheet.
+
+Once a \Rclass{ChIPQCexperiment} object has been constructed, it can be used in place of a \Rclass{DBA} object in most calls to \Biocpkg{DiffBind}.
+All plotting, counting, and analysis functions are available from \Biocpkg{DiffBind}. 
+
+It is also possible to extract a \Rclass{DBA} object from a \Rclass{ChIPQCexperiment} object using the \Rfunction{QCdba} method.
+The resulting \Rclass{DBA} object can be used in \Biocpkg{DiffBind} without restriction, although neither it nor \Rclass{DBA} objects based on it can be re-attached to the original \Rclass{ChIPQCexperiment} object (although they can be used in lieu of a sample sheet when creating a new one.) 
+
+In a typical workflow, the first step would be to run a \Biocpkg{ChIPQC} analysis before peak calling to assess library quality and establish what filtering should be done at the read level (mapping quality, duplicates, and blacklists).
+Next peaks would be called externally, and read into a new \Rclass{ChIPQCexperiment} object to assess peak-based metrics, such as FRIP, peak profiles, and clustering.
+
+At this point, \Biocpkg{DiffBind} could be used to perform occupancy analysis, derive consensus peak sets, re-count reads to form a binding matrix, and set up contrasts to carry out full differential binding analyses using the \Biocpkg{edgeR} and \Biocpkg{DESeq2} packages, along with  plotting and reporting functions.
+
+\section{Acknowledgements}
+
+We would like to acknowledge our co-authors, Wei Liu and Ines de Santiago, as well as Gordon Brown and everyone in the Bioinformatics Core at Cancer Research UK's Cambridge Institute at the University of Cambridge.
+
+\section{Session Info}
+<<sessionInfo, results=tex, print=TRUE, eval=TRUE>>=
+toLatex(sessionInfo())
+@
+
+\bibliography{ChIPQC}
+
+\end{document}
