@@ -4,19 +4,19 @@
 \alias{ReadLengthCrossCoverage-methods}
 \alias{ReadLengthCrossCoverage,ChIPQCexperiment-method}
 \alias{ReadLengthCrossCoverage,ChIPQCsample-method}
-\title{Retrieve the cross correlation values without extending reads}
+\title{Retrieve the cross coverage values without extending reads}
 \description{
-Retrieve the cross correlation values without extending reads.
+Retrieve the cross coverage values without extending reads.
 }
 \section{Methods}{
 \describe{
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
-Retrieve a \code{vector} of cross-correlation values for all samples in a ChIP-seq experiment, with no shift.
+Retrieve a \code{vector} of cross-coverage values for all samples in a ChIP-seq experiment, with no shift.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{
-Retrieve the cross-correlation value for a sample, with no shift.
+Retrieve the cross-coverage value for a sample, with no shift.
 }
 }}
 

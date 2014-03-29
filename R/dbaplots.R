@@ -4,15 +4,18 @@ do_plotCorHeatmap = function(object,attributes,...) {
    }
    atts=getAtts(attributes=attributes)  
    x = suppressWarnings(dba.plotHeatmap(object,attributes=atts,...))
-   return(x)
+   invisible(x)
 }
 
-do_plotPCA = function(object,attributes,...) {
+do_plotPCA = function(object,attributes,label,...) {
    if(sum(as.numeric(as.vector(dba.show(QCdba(object))$Intervals)))==0) {
       stop('No peaks to plot.')      
    }
-   atts=getAtts(attributes=attributes)  
-   x = suppressWarnings(dba.plotPCA(object,attributes=atts,...))
+   atts=getAtts(attributes=attributes)
+   if(!missing(label)){
+      label=getAtts(attributes=label)
+   }
+   x = suppressWarnings(dba.plotPCA(object,attributes=atts,label=label,...))
    return(x)
 }
 

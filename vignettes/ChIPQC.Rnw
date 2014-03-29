@@ -45,7 +45,7 @@ ChIPQCreport(experiment)
 
 By default, the HTML report and associated figures will be written in a sub directory named \Rcode{ChIPQCreport}, with the main html file named \Rcode{ChIPQC.html}. 
 
-An example report (corresponding to the second example below) is available for examination at \url{http://starkhome.com/ChIPQC/Reports/tamoxifen/ChIPQC.html}.
+An example report (corresponding to the second example below) is available for examination at \url{http://ChIPQC.starkhome.com/Reports/tamoxifen/ChIPQC.html}.
 
 \subsection{Summary: Generating a QC report for a ChIP-seq sample}
 
@@ -143,7 +143,7 @@ The final two metrics report the percentage of reads in different regions of int
 The first reports the percentage of reads that overlap called  peaks (also known as FRIP). This is another good indication of how "enriched" the sample is, and can be considered a "signal-to-noise" measure of what proportion of the library consists of fragments from binding sites vs. background reads.
 RiP\% values for ChIPs around 5\% or higher generally reflect successful enrichment.
 
-The final measure reports the percentage of reads that overlapped blacklisted regions (RiBL). The signal from blacklisted has been shown to contribute to confound peak callers and fragment length estimation as well as contribute to the read length peak in cross coverage and cross correlation read length peak (\cite{CRUK}). The RiBL score then may act as a guide for the level of background signal in a ChIP or input and is found to be correlated with SSD in input samples and the read length cross coverage score in both input and ChIP samples (\cite{CRUK}).
+The final measure reports the percentage of reads that overlapped blacklisted regions (RiBL). The signal from blacklisted has been shown to contribute to confound peak callers and fragment length estimation as well as contribute to the read length peak in cross coverage and cross coverage read length peak (\cite{CRUK}). The RiBL score then may act as a guide for the level of background signal in a ChIP or input and is found to be correlated with SSD in input samples and the read length cross coverage score in both input and ChIP samples (\cite{CRUK}).
 
 \subsection{Generating a summary QC report for experimental sample groups}
 
@@ -156,7 +156,7 @@ ChIPQCreport(exampleExp)
 By default, a sub directory will be created named \Rcode{ChIPQCreport} (this is configurable using the \Rcode{reportFolder} parameter), which will contain each of the plots.
 The main interactive HTML page (built using the R package \Rpackage{Nozzle}) is named \Rcode{ChIPQC.html} by default.
 This can be loaded into a browser.
-This report is available at \url{http://starkhome.com/ChIPQC/Reports/exampleExp/ChIPQC.html}. 
+This report is available at \url{http://ChIPQC.starkhome.com/Reports/exampleExp/ChIPQC.html}. 
 % An image of the report for the example data set is shown in \reff{exp1_report1} - \reff{exp1_report5}.
 % 
 % \begin{figure}
@@ -225,7 +225,7 @@ These profiles can vary depending on what type of mark is being studied -- trans
 
 Next is a bar chart of the Reads in Peaks. ChIP samples with good enrichment will have a higher proportion of their reads overlapping called peaks.The final plot shows these data in a different way, offering a box plot of the distribution of how many reads are in each peak.
 
-Finally, plots showing how the sample cluster are presented. The correlation heatmap is based on correlations values for all the peak scores for each sample. The other plot shows the first two principal component values for each sample. In this example, the replicates do cluster by replicate, which is a positive sign. the \Rcode{CTCF} replicates are highly correlated and form their own cluster. The \Rcode{E2F1} replicates are also highly correlated with each other, and anti-correlated with the \Rcode{CTCF} samples, probably due to their being from different cell lines.
+Finally, plots showing how the sample cluster are presented. The correlation heatmap is based on correlation values for all the peak scores for each sample. The other plot shows the first two principal component values for each sample. In this example, the replicates do cluster by replicate, which is a positive sign. the \Rcode{CTCF} replicates are highly correlated and form their own cluster. The \Rcode{E2F1} replicates are also highly correlated with each other, and anti-correlated with the \Rcode{CTCF} samples, probably due to their being from different cell lines.
 
 \subsubsection{Report: Files and Versions}
 
@@ -310,8 +310,8 @@ This example shows some variance in duplication rates amongst the samples, inclu
 For example the third \Rcode{MCF7} replicate has a duplication rate double that of the first replicat (although neither rate is so high as to indicate a massive PCR duplication issue). The second replicate has a very low rate, which should draw our attention to other metrics that indicate peak enrichment, such as SSD, Retlative CC, and the peak profile plot. 
 
 Next the read length, derived from the data in the bam files, is reported, along with the estimated mean fragment length. 
-The fragment length is estimated from the data by systematically shifting the reads on each strand towards each other until the highest degree of cross-correlation is obtained.
-The \Rcode{RelativeCC} metric is calculated by comparing the maximal cross correlation peak (at the shift size corresponding to he fragment length) to the cross correlation at a shift size corresponding to the read length, with higher scores (generally 2 or greater) indicating good enrichment.
+The fragment length is estimated from the data by systematically shifting the reads on each strand towards each other until the highest degree of cross-coverage is obtained.
+The \Rcode{RelativeCC} metric is calculated by comparing the maximal cross coverage peak (at the shift size corresponding to he fragment length) to the cross coverage at a shift size corresponding to the read length, with higher scores (generally 2 or greater) indicating good enrichment.
 In this example, the \Rcode{RelativeCC} scores for the controls are very low, as expected, while the scores for the ChIPs are all greater than 1.5, with most above 2, indicating good enrichment and reliable fragment length estimation.
 
 The SSD value is another indication of evidence of enrichment.
@@ -335,7 +335,7 @@ The only difference is that, in this case, the sample groups should be derived u
 ChIPQCreport(tamoxifen,facetBy=c("Tissue","Condition"))
 @
 
-The resulting report is not included in this vignette due to space limitations, but you are invited to generate it yourself and have a look. It is also available for examination at \url{http://starkhome.com/ChIPQC/Reports/tamoxifen/ChIPQC.html}.
+The resulting report is not included in this vignette due to space limitations, but you are invited to generate it yourself and have a look. It is also available for examination at \url{http://ChIPQC.starkhome.com/Reports/tamoxifen/ChIPQC.html}.
 
 \subsection{Plotting QC metrics for experimental sample groups}
 
@@ -360,10 +360,10 @@ A cross-coverage plot can be generated as follows:
 <<figCC, fig=TRUE, include=FALSE, width=9, height=6 >>=
 plotCC(tamoxifen,facetBy=c("Tissue","Condition"))
 @
-\incfig{ChIPQC-figCC}{.66\textwidth}{Example Cross-correlation plot.}
+\incfig{ChIPQC-figCC}{.66\textwidth}{Example Cross-coverage plot.}
   {Generated by \Rcode{plotCC(tamoxifen,facetBy=c("Tissue","Condition"))}}
   
-As shown in Figure~\ref{ChIPQC-figCC}, this plots the cross-correlation values over a range of shift sizes. The region up to the read length is highlighted, and a small peak in cross-correlation is expected to be found here. Notice that the controls do not have another higher peak, while ChIP samples with good enrichment have another peak in cross-correlation value at the fragment length, as shifting the reads on both strand should increase correlation at peak sites.
+As shown in Figure~\ref{ChIPQC-figCC}, this plots the cross-coverage values over a range of shift sizes. The region up to the read length is highlighted, and a small peak in cross-coverage is expected to be found here. Notice that the controls do not have another higher peak, while ChIP samples with good enrichment have another peak in cross-coverage value at the fragment length, as shifting the reads on both strand should increase coverage at peak sites.
 
 \subsubsection{Plotting Relative Enrichment of reads in Genomic Intervals}
 
@@ -461,15 +461,15 @@ A simpler way to see the key QC metrics is as follows:
 QCmetrics(CTCF1)
 @
 
-tamThis returns a \Rclass{vector} containing 10 metrics: the total number of reads in the bam file, the percentage that are aligned to the genome, the percentage that fall below the default mapping quality filter score of 15, the percentage of reads that align to exactly the same starting position as another read, the length of reads, the calculated fragment length, the relative cross-correlation score (based on the cross-correlation score when shifting by the fragment length vs. unshifted), the SSD (based on the standard deviation of the distribution of coverage pileup scores), and the percentage of reads that overlap peaks and blacklisted regions.
+tamThis returns a \Rclass{vector} containing 10 metrics: the total number of reads in the bam file, the percentage that are aligned to the genome, the percentage that fall below the default mapping quality filter score of 15, the percentage of reads that align to exactly the same starting position as another read, the length of reads, the calculated fragment length, the relative cross-coverage score (based on the cross-coverage score when shifting by the fragment length vs. unshifted), the SSD (based on the standard deviation of the distribution of coverage pileup scores), and the percentage of reads that overlap peaks and blacklisted regions.
 
 \subsection{Plotting QC metrics for a sample}
 
-Plots can be generated for individual samples. For example, here is the cross-correlation plot:
+Plots can be generated for individual samples. For example, here is the cross-coverage plot:
 <<figSampCC, fig=TRUE, include=FALSE, width=10, height=10 >>=
 plotCC(CTCF1)
 @
-\incfig{ChIPQC-figSampCC}{.66\textwidth}{Sample-level cross-correlation plot.}
+\incfig{ChIPQC-figSampCC}{.66\textwidth}{Sample-level cross-coverage plot.}
   {Generated by \Rcode{figSampCC(CTCF)}}
 shown as Figure~\ref{ChIPQC-figSampCC}
 
@@ -518,7 +518,7 @@ In this example we choose to group by sample names to produce individual plots p
 <<figCCBySample, fig=TRUE, include=FALSE, width=9, height=6 >>=
 plotCC(exampleExp,facetBy="Sample")
 @
-\incfig{ChIPQC-figCCBySample}{.66\textwidth}{Cross-correlation plot grouped by Sample ID.}
+\incfig{ChIPQC-figCCBySample}{.66\textwidth}{Cross-coverage plot grouped by Sample ID.}
   {Generated by \Rcode{plotCC(exampleExp,facetBy="Sample")}}
   
 
@@ -527,7 +527,7 @@ In Figure~\ref{ChIPQC-figCCColourByFlineByTissue}) we colour by factor and set t
 <<figCCColourByFlineByTissue, fig=TRUE, include=FALSE, width=9, height=6 >>=
 plotCC(exampleExp,facetBy="Sample",colourBy="Factor",lineBy="Tissue")
 @
-\incfig{ChIPQC-figCCColourByFlineByTissue}{.66\textwidth}{Cross-correlation plot grouped by Sample ID.}
+\incfig{ChIPQC-figCCColourByFlineByTissue}{.66\textwidth}{Cross-coverage plot grouped by Sample ID.}
   {Generated by \Rcode{plotCC(exampleExp,facetBy="Sample",colourBy="Factor",lineBy="Tissue")}}
   
 
@@ -546,7 +546,7 @@ SSD =QCmetrics(exampleExp)[,("SSD")]
 plotCC(exampleExp,facetBy="Sample",lineBy="Tissue",addMetaData=extraMetadata,colourBy="SSD")
 
 @
-\incfig{ChIPQC-figCCaddMetadata}{.66\textwidth}{Cross-correlation plot grouped by Sample ID.}
+\incfig{ChIPQC-figCCaddMetadata}{.66\textwidth}{Cross-coverage plot grouped by Sample ID.}
   {Generated by \Rcode{plotCC(exampleExp,facetBy="Sample",lineBy="Tissue",addMetaData=extraMetadata,colourBy="SSD")}}
 
 

@@ -339,7 +339,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
    plotCorHeatmap(object,attributes=c(facetBy,colourBy))
    dev.off()
    png(file.path(reportFolder,"PeakPCA.png"),width=600,height=600)
-   plotPrincomp(object,attributes=facetBy,dotSize=2)
+   plotPrincomp(object,attributes=facetBy,label=colourBy)
    dev.off()
    ripPlot <- newFigure(file.path("Rip.png"),"Barplot of the absolute number of reads in peaks",
                         type = IMAGE.TYPE.RASTER, exportId = NULL,
