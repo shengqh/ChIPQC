@@ -14,29 +14,86 @@ Object containing quality metrics computed for a ChIP-seq (or associated control
 Objects can be created using the \code{\link{ChIPQCsample}} function.
 
 }
+
+\section{Constructor Function}{
+\code{
+ChIPQCsample(reads, peaks, annotation = "hg19", chromosomes = NULL, mapQCth = 15, 
+             blacklist, profileWin = 400, fragmentLength = 125, shifts = 1:300, 
+             runCrossCor = FALSE)
+}
+%- maybe also 'usage' for other objects documented here.
+\itemize{
+  \item{\code{reads}}{charatcer string filename of .bam file}
+  \item{\code{peaks}}{\code{\link{GRanges}} object or character stirng filename of peaks. If present, peak-based metrics will be computed.
+}
+
+\item{\code{annotation}}{
+Either a character string indicating the genome and version to use as a genomic annotation, or a previously defined annotation (obtained using \code{\link{QCannotation}} on a previously defined \code{\link{ChIPQCexperiment}} object.)  May be left unspecified, in which case no genomic feature analysis is performed. The following annotation specificiers are supported:
+
+\tabular{ll}{
+"hg19" \tab Human, version 19 \cr
+"hg18" \tab Human, version 18 \cr
+"mm10" \tab Mouse, version 10 \cr
+"mm9" \tab Mouse, version 19 \cr
+"rn4" \tab Rat, version 4 \cr
+"ce6" \tab C. Elgans, version 6 \cr
+"dm3"  \tab D. Melanogaster, version 3 \cr
+}
+
+Alternatively, you can construct your own annotation; 
+see the package Vignette for more information.
+}
+
+\item{\code{chromosomes}}{
+Specification of which chromosomes to use for computing QC statistics. If missing, the first chromosome on which has a peak is checked. If NULL, all chromosomes will be checked (which may be time-consuming). This can be a character string (e.g. \dQuote{chr18}) or a vector or list of character strings. If it is an integer or vector of integers, the chromosomes will be checked based on the order that they are listed in a peak set.
+}
+  \item{\code{mapQCth}}{
+An integer representing a mapping quality score threshold. Only reads with mapping quality scores above this threshold will be used for some statistics.
+}
+  \item{\code{blacklist}}{
+A \code{\link{GRanges}} object or filename specifying a bed file containing genomic regions that should be excluded from the analysis. Is missing and the \code{annotation} is \dQuote{hg19}, a default blacklist, \code{\link{blacklist_hg19}} derived from the UCSC list, sill be used. No blacklist is used if this is set to NULL, or is left missing and the annotation is not \dQuote{hg19}.
+}
+  \item{\code{profileWin}}{
+An integer indicating the width, in base pairs, of the window to be used for peak profiles. Peaks will be centered on their summits, and include half the window size upstream and half downstream of this point.
+}
+  \item{\code{fragmentLength}}{
+An integer indicating the expected fragment length of the libraries. Optional, as this value will be computed.
+}
+  \item{\code{shifts}}{
+A vector of values to try when computing optimal shift sizes. 
+}
+  \item{\code{runCrossCor}}{
+Compute cross-correlaiton in addition to cross-coverage. This will take more compute time, and is currently not used inthe final report.
+}
+}
+}
+
 \section{Slots}{
   \describe{
-    \item{\code{AveragePeakSignal}:}{Object of class \code{"list"} ~~ }
-    \item{\code{CrossCoverage}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{SSD}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{CountsInPeaks}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{CountsInBlackList}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{CountsInFeatures}:}{Object of class \code{"list"} ~~ }
-    \item{\code{PropInFeatures}:}{Object of class \code{"list"} ~~ }
-    \item{\code{CoverageHistogram}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{FlagAndTagCounts}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{readlength}:}{Object of class \code{"numeric"} ~~ }
-    \item{\code{seqnames}:}{Object of class \code{"Rle"} ~~ }
-    \item{\code{ranges}:}{Object of class \code{"IRanges"} ~~ }
-    \item{\code{strand}:}{Object of class \code{"Rle"} ~~ }
-    \item{\code{elementMetadata}:}{Object of class \code{"DataFrame"} ~~ }
-    \item{\code{seqinfo}:}{Object of class \code{"Seqinfo"} ~~ }
-    \item{\code{metadata}:}{Object of class \code{"list"} ~~ }
+    \item{\code{AveragePeakSignal}:}{Object of class \code{"list"} }
+    \item{\code{CrossCoverage}:}{Object of class \code{"numeric"}  }
+    \item{\code{CrossCorrelation}:}{Object of class \code{"numeric"}  }
+    \item{\code{SSD}:}{Object of class \code{"numeric"}  }
+    \item{\code{SSDBL}:}{Object of class \code{"numeric"}  }
+    \item{\code{CountsInPeaks}:}{Object of class \code{"numeric"} }
+    \item{\code{CountsInBlackList}:}{Object of class \code{"numeric"} }
+    \item{\code{CountsInFeatures}:}{Object of class \code{"list"}  }
+    \item{\code{PropInFeatures}:}{Object of class \code{"list"}  }
+    \item{\code{CoverageHistogram}:}{Object of class \code{"numeric"} }
+    \item{\code{FlagAndTagCounts}:}{Object of class \code{"numeric"}  }
+    \item{\code{readlength}:}{Object of class \code{"numeric"}  }
+    \item{\code{seqnames}:}{Object of class \code{"Rle"}  }
+    \item{\code{ranges}:}{Object of class \code{"IRanges"}  }
+    \item{\code{strand}:}{Object of class \code{"Rle"}  }
+    \item{\code{elementMetadata}:}{Object of class \code{"DataFrame"}  }
+    \item{\code{seqinfo}:}{Object of class \code{"Seqinfo"} }
+    \item{\code{metadata}:}{Object of class \code{"list"} }
   }
 }
 \section{Extends}{
 Class \code{"\linkS4class{GRanges}"}
 }
+
 \section{Methods}{
   \describe{ 
     \item{averagepeaksignal}{\code{signature(object = "ChIPQCsample")}: see \code{\link{averagepeaksignal}}.}

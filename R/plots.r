@@ -351,6 +351,7 @@ setMethod("plotFribl", "ChIPQCsample", function(object,type="barstacked"){
 ##############################################
 ##############################################
 makeRapPlot <- function(rapDataFrame){
+
    P <- ggplot(rapDataFrame, aes(Sample, CountsInPeaks))+
       geom_boxplot(fill="lightblue")+
       theme(axis.title.y=element_text(angle=0))+
@@ -367,7 +368,8 @@ setMethod("plotRap", "ChIPQCsample", function(object){
    
    Peaks <- peaks(object)
    if(length(Peaks) > 0){
-      CountsInPeaks <- Peaks$Counts  
+      #CountsInPeaks <- (Peaks$Counts/mapped(object))*10^6  
+      CountsInPeaks <- Peaks$Counts
       rapDataFrame <- data.frame(Sample="Sample",CountsInPeaks=CountsInPeaks)
       Plot <- makeRapPlot(rapDataFrame)
       return(Plot)
@@ -395,6 +397,7 @@ setMethod("plotRap", "ChIPQCexperiment", function(object,facet=TRUE,
    rapDataFrameWithMetaData <- merge(rapDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)      
    colnames(rapDataFrameWithMetaData)[1:3] <- c("Sample","PeakNumber","CountsInPeaks")
    
+   
    Plot <- makeRapPlot(rapDataFrameWithMetaData)
    
    metadataOpts$facetBy[2]$free$x <- TRUE
@@ -409,6 +412,7 @@ setMethod("plotRap", "ChIPQCexperiment", function(object,facet=TRUE,
 #########################################
 
 makeRegiPlot <- function(regiScoresFrame){
+   regiScoresFrame[,"GenomicIntervals"] <- factor(regiScoresFrame[,"GenomicIntervals"],levels=as.vector(regiScoresFrame[,"GenomicIntervals"]))
    Plot <- ggplot(regiScoresFrame, aes(Sample,GenomicIntervals))  
    Plot <- Plot+geom_tile(aes(y=Sample,x=GenomicIntervals,fill = log2_Enrichment)) +
       scale_fill_gradient2(low="blue",high="yellow",mid="black",midpoint=median(regiScoresFrame$log2_Enrichment))
@@ -427,20 +431,21 @@ setMethod("plotRegi", "ChIPQCexperiment", function(object,facet=TRUE,
    
    
    regiScores <- regi(object)
-   rownames(regiScores)[5:7] <- c("500_Upstream","2000To500_Upstream","20000To2000_Upstream")   
+   #rownames(regiScores)[5:7] <- c("500_Upstream","2000To500_Upstream","20000To2000_Upstream")   
    meltedDF <- melt(regiScores)
    
-   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)        
+   #metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)        
    regiScoresFrame <- data.frame(Sample=meltedDF$Var2,
                                  GenomicIntervals=meltedDF$Var1,
                                  log2_Enrichment=meltedDF$value)
-   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)        
+   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)
+   
    facetGridForm <- as.formula(paste0(paste(names(metadataOpts$facetBy$facets),collapse="+"),"~."))
    
-   regiScoresFrameWithMetadata <- merge(regiScoresFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE)      
-   
-   regiScoresFrameWithMetadata[,"GenomicIntervals"] <- ordered(regiScoresFrameWithMetadata[,"GenomicIntervals"],c("20000To2000_Upstream","2000To500_Upstream",
-                                                                                                                  "500_Upstream","5UTRs","Transcripts","Introns","3UTRs"))
+   regiScoresFrameWithMetadata <- merge(regiScoresFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE,sort=FALSE)      
+  
+   #regiScoresFrameWithMetadata[,"GenomicIntervals"] <- ordered(regiScoresFrameWithMetadata[,"GenomicIntervals"],c("20000To2000_Upstream","2000To500_Upstream",
+   #                                                                                                               "500_Upstream","5UTRs","Transcripts","Introns","3UTRs"))
    
    Plot <- makeRegiPlot(regiScoresFrameWithMetadata)
    

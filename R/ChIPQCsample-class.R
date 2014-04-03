@@ -1,7 +1,7 @@
 
 setClass("ChIPQCsample",contains = "GRanges",
          slots=c(AveragePeakSignal="list",
-                 CrossCoverage="numeric",SSD="numeric",CountsInPeaks="numeric",
+                 CrossCoverage="numeric",CrossCorrelation="numeric",SSD="numeric",SSDBL="numeric",CountsInPeaks="numeric",
                  CountsInBlackList="numeric",CountsInFeatures="list",PropInFeatures="list",
                  CoverageHistogram="numeric",FlagAndTagCounts="numeric",
                  readlength="numeric"
@@ -103,11 +103,11 @@ setGeneric("regi", function(object="ChIPQCsample") standardGeneric("regi"))
 setMethod("regi", "ChIPQCsample", function(object){
    PropCountInFeatures <- data.frame(PropCountInFeatures=unlist(PropCountsInFeatures(object)),row.names=names(PropCountsInFeatures(object)))
    PropGenomeInFeatures <- data.frame(PropGenomeInFeature=unlist(PropGenomeInFeature(object)),row.names=names(PropGenomeInFeature(object)))
-   regiFrame <- merge(PropCountInFeatures,PropGenomeInFeatures,by=0,all=FALSE)
+   regiFrame <- merge(PropCountInFeatures,PropGenomeInFeatures,by=0,all=FALSE,sort=FALSE)
    regi <- log2(regiFrame[,"PropCountInFeatures"]/regiFrame[,"PropGenomeInFeature"])
    names(regi) <- regiFrame[,"Row.names"]
-   regi = regi[c(1,2,3,7,6,5,4)]
-   names(regi)[2] = "5UTRs"
+   #regi = regi[c(1,2,3,7,6,5,4)]
+   #names(regi)[2] = "5UTRs"
    return(regi)
 })
 

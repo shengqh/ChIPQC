@@ -1,11 +1,11 @@
 ChIPQCsample = function(reads, peaks, annotation="hg19", chromosomes=NULL, 
-                        mapQCth=15, blacklist, profileWin=400,fragmentLength=125,shifts=1:300) {
+                        mapQCth=15, blacklist, profileWin=400,fragmentLength=125,shifts=1:300,runCrossCor=FALSE) {
    
    if(missing(peaks)) peaks=NULL
    if(missing(blacklist)) blacklist=NULL
    res = sampleQC(bamFile=reads, bedFile=peaks, GeneAnnotation=annotation,blklist=blacklist,ChrOfInterest=chromosomes,
                   Window=profileWin,FragmentLength=fragmentLength,
-                  shiftWindowStart=min(shifts),shiftWindowEnd=max(shifts))
+                  shiftWindowStart=min(shifts),shiftWindowEnd=max(shifts),runCrossCor=runCrossCor)
    
    return(res)
 }
