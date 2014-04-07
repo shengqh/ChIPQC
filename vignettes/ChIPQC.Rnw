@@ -90,7 +90,6 @@ It does this using the \Biocpkg{BiocParallel} package, which by default will run
 For each unique sample (including controls), a \Robject{ChIPQCsample} object us constructed and added to a list. This list of samples forms the core of the \Robject{ChIPQCexperiment} object, which is constructed and returned by \Rfunction{ChIPQC}.
 
 The parameters for \Rfunction{ChIPQC} include an \Rcode{annotation} indicating what assembly of what genome is being analyzed.
-NB: currently, only "hg19" is supported, with more to follow.
 The \Rcode{chromosomes} parameter specifies which chromosomes to examine when computing quality metrics.
 Restricting the chromosomes analysed can greatly increase the speed of the computations, as well as reducing the size of the resulting \Robject{ChIPQCexperiment} object.
 For this example we will limit the analysis to chromosome 18, the only chromosome for which data is included.
@@ -267,7 +266,6 @@ It does this using the \Biocpkg{BiocParallel} package, which by default will run
 For each unique sample (including controls), a \Robject{ChIPQCsample} object us constructed and added to a list. This list of samples forms the core of the \Robject{ChIPQCexperiment} object, which is constructed and returned by \Rfunction{ChIPQC}.
 
 The parameters for \Rfunction{ChIPQC} include an \Rcode{annotation} indicating what assembly of what genome is being analyzed.
-NB: currently, only "hg19" is supported, with more to follow.
 The \Rcode{chromosomes} parameter specifies which chromosomes to examine when computing quality metrics.
 Restricting the chromosomes analysed can greatly increase the speed of the computations, as well as reducing the size of the resulting \Robject{ChIPQCexperiment} object.
 For this example we will limit the analysis to chromosome 18, the only chromosome for which data is included.
