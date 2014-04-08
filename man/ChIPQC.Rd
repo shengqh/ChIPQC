@@ -9,7 +9,7 @@ Constructs a new \code{\link{ChIPQCexperiment}} object.
 }
 \usage{
 ChIPQC(experiment, annotation="hg19", chromosomes, samples,
-       consensus, bCount=FALSE, mapQCth=15, blacklist=NULL, 
+       consensus=TRUE, bCount=FALSE, mapQCth=15, blacklist=NULL, 
        profileWin=400, fragmentLength=125, shifts=1:300, ...)
 }
 
