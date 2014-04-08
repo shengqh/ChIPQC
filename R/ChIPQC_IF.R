@@ -144,10 +144,10 @@ ChIPQC = function(experiment, annotation="hg19", chromosomes, samples,
    if(bCount) {
       message('Counting reads in consensus peakset...')
       if(!is.null(peaks)) {
-         experiment = dba.count(experiment,peaks=peaks,...)    
+         experiment = dba.count(experiment,peaks=peaks,mapQCth=mapQCth,...)    
          meta = data.frame(t(experiment$class))
       } else {
-         experiment = dba.count(experiment,...)   
+         experiment = dba.count(experiment,mapQCth=mapQCth,...)   
          meta = data.frame(t(experiment$class))
       }
       if(nrow(meta) != length(samplelist)) {
@@ -196,6 +196,7 @@ ChIPQC = function(experiment, annotation="hg19", chromosomes, samples,
    res = new("ChIPQCexperiment",Samples=samples,DBA=experiment,annotation=annotation)
    config = as.list(res@DBA$config)
    config$fragmentSize = fragmentlength(res)
+   config$mapQCth = mapQCth
    res@DBA$config = config
    
    return(res)

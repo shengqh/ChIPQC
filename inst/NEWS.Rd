@@ -2,15 +2,8 @@
 \title{ChIPQC News}
 \encoding{UTF-8}
 
-\section{version 0.99.5}{
+\section{Version 1.0.0}{
  \itemize{
-    \item{Added more annotations}
+  \item{Initial release.}
   }
- }
-
-
-\section{version 0.99.1}{
- \itemize{
-    \item{Initial version submitted to Bioc}
-  }
- }
+}
