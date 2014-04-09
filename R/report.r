@@ -100,7 +100,7 @@ makeMFDSection <- function(object,riblPlot,gfePlot){
    mfdParagraph10 <- newParagraph("The identifaction of genomic stretches of artefact signal has been previously described\
                                   for single samples using Input controls and more recently work as part of the Encode consortium has\ 
                                   identified conserved regions of high artefact signal for many model organisms.")
-   mfdParagraph11 <- newParagraph("The proportion of total ChIP signal within known artefact regions can therefore be\
+   mfdParagraph11 <- newParagraph("The percentage of total ChIP signal within known artefact regions can therefore be\
                                   useful to evaluate the level of such confounding, abbarant signal in a sample.
                                   ")          
    
@@ -110,7 +110,7 @@ makeMFDSection <- function(object,riblPlot,gfePlot){
    mfdParagraph10 <- newParagraph("The identifaction of genomic stretches of artefact signal has been previously described\
                                   for single samples using Input controls and more recently work as part of the Encode consortium has\ 
                                   identified conserved regions of high artefact signal for many model organisms.")
-   mfdParagraph11 <- newParagraph("The proportion of total ChIP signal within known artefact regions can therefore be\
+   mfdParagraph11 <- newParagraph("The percentage of total ChIP signal within known artefact regions can therefore be\
                                   useful to evaluate the level of such confounding, abbarant signal in a sample.
                                   ",asStrong("(Figure 1)"))          
    mfdParagraph12 <- newParagraph("The distribution of reads across known genomic features such as genes and their subcomponents\
@@ -225,11 +225,11 @@ makeDistAndStrucSection <- function(object,covhistPlot,ccPlot){
 makePeakProfileSection <- function(object,ripPlot,rapPlot,peakProfilePlot,peakCorHeatmap,peakPrinComp){
    peakProfileSubSection <- newSubSection("Peak Profile and ChIP Enrichment")
    peakProfileParagraph1 <- newParagraph("Following the identification of genome wide enrichment (peak calling),\
-                                         the proportion of ChIP signal within enriched regions, as well\
+                                         the percentage of ChIP signal within enriched regions, as well\
                                          the average profile across these regions can be used to further evaluate ChIP quality")
    
    
-   peakProfileParagraph2 <- newParagraph(asStrong("Figure6")," shows the total proportion of reads contained within enriched regions or peaks.\
+   peakProfileParagraph2 <- newParagraph(asStrong("Figure6")," shows the total percentage of reads contained within enriched regions or peaks.\
                                          The higher efficiency ChIP-seq will show a higher percentage of reads in enriched regions/peaks and longer epigenetic \
                                          marks will often have a higher ranges of efficiencies than punctate marks or transcription factors.
                                          ")
@@ -327,7 +327,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
    
    ggsave(plotFribl(object,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Ribl.png"))
    
-   riblPlot <- newFigure(file.path("Ribl.png"),"Barplot of the absolute number of reads in blacklists",
+   riblPlot <- newFigure(file.path("Ribl.png"),"Barplot of the percentage of reads in blacklists",
                          type = IMAGE.TYPE.RASTER, exportId = NULL,
                          protection = PROTECTION.PUBLIC)
    
@@ -341,7 +341,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
    png(file.path(reportFolder,"PeakPCA.png"),width=600,height=600)
    plotPrincomp(object,attributes=facetBy,label=colourBy)
    dev.off()
-   ripPlot <- newFigure(file.path("Rip.png"),"Barplot of the absolute number of reads in peaks",
+   ripPlot <- newFigure(file.path("Rip.png"),"Barplot of the percentage number of reads in peaks",
                         type = IMAGE.TYPE.RASTER, exportId = NULL,
                         protection = PROTECTION.PUBLIC)
    rapPlot <- newFigure(file.path("Rap.png"),"Density plot of the number of reads in peaks",
@@ -422,7 +422,7 @@ setMethod("ChIPQCreport", "ChIPQCsample", function(object,
    if(!is.na(ribl(object))){
       
       ggsave(plotFribl(object),filename=file.path(reportFolder,"Ribl.png"))
-      riblPlot <- newFigure(file.path("Ribl.png"),"Barplot of the absolute number of reads in blacklists",
+      riblPlot <- newFigure(file.path("Ribl.png"),"Barplot of the percentage of reads in blacklists",
                             type = IMAGE.TYPE.RASTER, exportId = NULL,
                             protection = PROTECTION.PUBLIC)
    }else{
@@ -436,7 +436,7 @@ setMethod("ChIPQCreport", "ChIPQCsample", function(object,
       ggsave(plotRap(object),filename=file.path(reportFolder,"Rap.png"))
       ggsave(plotPeakProfile(object),filename=file.path(reportFolder,"PeakProfile.png"))
       
-      ripPlot <- newFigure(file.path("Rip.png"),"Barplot of the absolute number of reads in peaks",
+      ripPlot <- newFigure(file.path("Rip.png"),"Barplot of the percentage of reads in peaks",
                            type = IMAGE.TYPE.RASTER, exportId = NULL,
                            protection = PROTECTION.PUBLIC)
       rapPlot <- newFigure(file.path("Rap.png"),"Density plot of the number of reads in peaks",
