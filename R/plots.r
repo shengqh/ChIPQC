@@ -34,7 +34,7 @@ mergeMetadata <- function(object,addMetaData,facetBy,colourBy,lineBy){
 
 makeCCplot <- function(CCDataFrame,shiftlength,readlen){
    P <- ggplot(CCDataFrame,aes(x=Shift_Size,y=CC_Score))+geom_path(alpha = 1,size=1.3)+xlim(0,shiftlength)+ylab("CC_Score")+
-      geom_rect(data=CCDataFrame,xmin=-Inf,colour="red",xmax=readlen*2,ymin=-Inf,ymax=Inf,fill="red",alpha = 0.002)+
+      geom_rect(data=CCDataFrame,xmin=-Inf,colour="grey80",xmax=readlen*2,ymin=-Inf,ymax=Inf,fill="grey20",alpha = 0.002)+
       theme(axis.title.y=element_text(angle=0))
    return(P)
 }
@@ -242,7 +242,7 @@ makeFripPlot <- function(fripDataFrame){
    
    P <- ggplot(fripDataFrame, aes(Sample,FRIP, fill=Reads))
    P <- P+geom_bar(stat="identity")
-   P <- P+labs(title = "Reads In Peaks")
+   P <- P+labs(title = "Percentage of Reads In Peaks")
    P <- P+theme(axis.title.y=element_text(angle=0),panel.background = element_blank())+scale_fill_manual(values=c( "#000099","#CCCCFF"))
    
    return(P)
@@ -250,18 +250,26 @@ makeFripPlot <- function(fripDataFrame){
 
 setGeneric("plotFrip", function(object="ChIPQCexperiment",type="barstacked",facet=TRUE,
                                 facetBy=c("Tissue","Factor"),
-                                addMetaData=NULL) standardGeneric("plotFrip"))
+                                addMetaData=NULL,AsPercent=TRUE) standardGeneric("plotFrip"))
 
 
 
 setMethod("plotFrip", "ChIPQCexperiment", function(object,type="barstacked",facet=TRUE,
                                                    facetBy=c("Tissue","Factor"),
-                                                   addMetaData=NULL){
+                                                   addMetaData=NULL,AsPercent=TRUE){
    rip <- rip(object)
    mapped <- mapped(object)  
    ripWithPeaks <- rip[!is.na(rip)]
    mappedWithPeaks <- mapped[!is.na(rip)]
    toMelt <- data.frame(Sample=names(ripWithPeaks),Inside=ripWithPeaks,OutSide=mappedWithPeaks-ripWithPeaks)
+   PercentInside <- toMelt[,"Inside"]/rowSums(toMelt[,c("Inside","OutSide")])
+   PercentOutside <- toMelt[,"OutSide"]/rowSums(toMelt[,c("Inside","OutSide")])
+   if(AsPercent){
+     toMelt[,"Inside"] <- PercentInside*100
+     toMelt[,"OutSide"] <- PercentOutside*100
+   }
+   
+   
    fripDataFrame <- melt(toMelt)
    
    
@@ -280,13 +288,19 @@ setMethod("plotFrip", "ChIPQCexperiment", function(object,type="barstacked",face
 })
 
 setMethod("plotFrip", "ChIPQCsample", function(object,type="barstacked",facet=TRUE,
-                                               facetBy=c("Tissue","Factor")){
+                                               facetBy=c("Tissue","Factor"),AsPercent=TRUE){
    rip <- rip(object)
    mapped <- mapped(object)  
    fripDataFrame <- data.frame(
       Sample=c("Sample","Sample"),
-      Reads=c("Inside Peaks","Outside Peaks"),
+      Reads=c("Inside","Outside"),
       FRIP=c(rip,mapped-rip))
+
+   if(AsPercent){
+     fripDataFrame[,"FRIP"] <- (fripDataFrame[,"FRIP"]/sum(fripDataFrame[,"FRIP"]))*100
+   }
+   
+   
    Plot <- makeFripPlot(fripDataFrame)
    Plot <- Plot+xlab("")
    return(Plot)
@@ -298,7 +312,7 @@ makeFriblPlot <- function(friblDataFrame){
    
    P <- ggplot(friblDataFrame, aes(Sample,FRIBL, fill=Reads))
    P <- P+geom_bar(stat="identity")
-   P <- P+labs(title = "Proportion Of Reads In Blacklists")
+   P <- P+labs(title = "Percentage Of Reads In Blacklists")
    P <- P+theme(axis.title.y=element_text(angle=0),panel.background = element_blank())+scale_fill_manual(values=c( "#000099","#CCCCFF"))      
    return(P)
 }
@@ -307,16 +321,23 @@ makeFriblPlot <- function(friblDataFrame){
 
 setGeneric("plotFribl", function(object="ChIPQCexperiment",type="barstacked",facet=TRUE,
                                  facetBy=c("Tissue","Factor"),
-                                 addMetaData=NULL) standardGeneric("plotFribl"))
+                                 addMetaData=NULL,AsPercent=TRUE) standardGeneric("plotFribl"))
 
 setMethod("plotFribl", "ChIPQCexperiment", function(object,type="barstacked",facet=TRUE,
                                                     facetBy=c("Tissue","Factor"),
-                                                    addMetaData=NULL){
+                                                    addMetaData=NULL,AsPercent=TRUE){
+   AsPercent <- TRUE
    ribl <- ribl(object)
    mapped <- mapped(object)  
    riblWithBLs <- ribl[!is.na(ribl)]
    mappedWithBLs <- mapped[!is.na(ribl)]
    toMelt <- data.frame(Sample=names(riblWithBLs),Inside=riblWithBLs,OutSide=mappedWithBLs-riblWithBLs)
+   PercentInside <- toMelt[,"Inside"]/rowSums(toMelt[,c("Inside","OutSide")])
+   PercentOutside <- toMelt[,"OutSide"]/rowSums(toMelt[,c("Inside","OutSide")])
+   if(AsPercent){
+     toMelt[,"Inside"] <- PercentInside*100
+     toMelt[,"OutSide"] <- PercentOutside*100
+   }
    friblDataFrame <- melt(toMelt)
    
    
@@ -330,18 +351,25 @@ setMethod("plotFribl", "ChIPQCexperiment", function(object,type="barstacked",fac
    metadataOpts$facetBy$free$x <- TRUE
    Plot <- Plot + 
       metadataOpts$facetBy 
+#   if(AsPercent){
+#      Plot+scale_y_continuous(labels = "percent")
+#   }
    return(Plot)
    
 })
 
-setMethod("plotFribl", "ChIPQCsample", function(object,type="barstacked"){
+setMethod("plotFribl", "ChIPQCsample", function(object,type="barstacked",AsPercent=TRUE){
+   #AsPercent <- TRUE
    ribl <- ribl(object)
    mapped <- mapped(object) 
    friblDataFrame <- data.frame(
       Sample=c("Sample","Sample"),
-      Reads=c("Inside Blacklist","Outside Blacklist"),
+      Reads=c("Inside","Outside"),
       FRIBL=c(ribl,mapped-ribl)   
-   )  
+   )
+   if(AsPercent){
+    friblDataFrame[,"FRIBL"] <- (friblDataFrame[,"FRIBL"]/sum(friblDataFrame[,"FRIBL"]))*100
+   }
    Plot <- makeFriblPlot(friblDataFrame)
    Plot <- Plot+xlab("")
    return(Plot)
@@ -384,10 +412,8 @@ setMethod("plotRap", "ChIPQCexperiment", function(object,facet=TRUE,
    Peaks <- peaks(object)
    peakCountList <- sapply(peaks(object),function(x)elementMetadata(x)$Counts)
    peakCountMatrix <- list2matrix(peakCountList)
-   #   rapDataFrame <- data.frame(
+   ylimNew <- c(0,max(unlist(lapply(apply(peakCountMatrix,2,function(x) boxplot.stats(x[x!=0])),function(x) x$stats[5]))))
    
-   
-   #   )
    rapDataFrame <- melt(peakCountMatrix)
    metadata <- QCmetadata(object)         
    
@@ -403,6 +429,7 @@ setMethod("plotRap", "ChIPQCexperiment", function(object,facet=TRUE,
    metadataOpts$facetBy[2]$free$x <- TRUE
    
    Plot <- Plot + metadataOpts$facetBy 
+   Plot <- Plot + coord_cartesian(ylim = ylimNew*1.05)
    return(Plot)
    
 })
@@ -412,7 +439,7 @@ setMethod("plotRap", "ChIPQCexperiment", function(object,facet=TRUE,
 #########################################
 
 makeRegiPlot <- function(regiScoresFrame){
-   regiScoresFrame[,"GenomicIntervals"] <- factor(regiScoresFrame[,"GenomicIntervals"],levels=as.vector(regiScoresFrame[,"GenomicIntervals"]))
+   regiScoresFrame[,"GenomicIntervals"] <- factor(regiScoresFrame[,"GenomicIntervals"],levels=unique(as.vector(regiScoresFrame[,"GenomicIntervals"])))
    Plot <- ggplot(regiScoresFrame, aes(Sample,GenomicIntervals))  
    Plot <- Plot+geom_tile(aes(y=Sample,x=GenomicIntervals,fill = log2_Enrichment)) +
       scale_fill_gradient2(low="blue",high="yellow",mid="black",midpoint=median(regiScoresFrame$log2_Enrichment))

@@ -12,11 +12,11 @@ Generate fraction of reads in blacklist plot.
 \describe{
 
 \item{\code{signature(object = "ChIPQCexperiment", type="barstacked",facet=T,
-                     facetBy=c("Tissue","Factor"))}}{
+                     facetBy=c("Tissue","Factor"),AsPercent=TRUE)}}{
 Generate fraction of reads in blacklist plots for all the samples in an experiment.
 }
 
-\item{\code{signature(object = "ChIPQCsample", type="barstacked")}}{
+\item{\code{signature(object = "ChIPQCsample", type="barstacked",AsPercent=TRUE)}}{
 Generate fraction of reads in blacklist plots for a sample.
 }
 }}

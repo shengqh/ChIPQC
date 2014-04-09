@@ -12,12 +12,12 @@ Generate fraction of reads in peaks plot.
 \describe{
 
 \item{\code{signature(object = "ChIPQCexperiment", type="barstacked",facet=T,
-                      facetBy=c("Tissue","Factor"))}}{
+                      facetBy=c("Tissue","Factor"),AsPercent=TRUE)}}{
 Generate fraction of reads in peaks plots for all the samples in an experiment.
 }
 
 \item{\code{signature(object = "ChIPQCsample",type="barstacked",facet=T,
-                                facetBy=c("Tissue","Factor"))}}{
+                                facetBy=c("Tissue","Factor"),AsPercent=TRUE)}}{
 Generate fraction of reads in peaks plots for a sample.
 }
 }}
