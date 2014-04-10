@@ -21,7 +21,7 @@ importMethodsFrom(IRanges, "%in%", as.list, as.matrix, "colnames<-",
                   "elementMetadata<-", end, flank, gsub, mean, median,
                   merge, ranges, reduce, resize, "rownames<-",
                   runLength, runValue, sd, shiftApply, start, t,
-                  viewMaxs, Views, which, which.max, width)
+                  viewMaxs, viewApply, Views, which, which.max, width)
 
 importMethodsFrom(methods, show)
 

@@ -123,6 +123,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
             #GRangesOfInterestListGA <- GRangesList()
             noVersionGeneAnnotation <- GeneAnnotation[!names(GeneAnnotation)=="version"]
             GRangesOfInterestListGF <- GRangesList()
+            seqlevels(GRangesOfInterestListGF) <- names(ChrLengths)
             for(g in 1:length(noVersionGeneAnnotation)){ 
                GRangesOfInterestListGF <- c(
                   GRangesOfInterestListGF,
