@@ -101,10 +101,10 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
             bedRanges <- GetGRanges(bedFile,as.vector(names(ChrLengths)),names(ChrLengths)[k])
             GRangesOfInterestList <- GRangesList(GRanges(seqnames(bedRanges),ranges(bedRanges)))
             names(GRangesOfInterestList) <- c(names(GRangesOfInterestList),"Peaks")
-            seqlevels(GRangesOfInterestList) <- names(ChrLengths)[k]
+            seqlevels(GRangesOfInterestList) <- names(ChrLengths)
          }else{
             GRangesOfInterestList <- GRangesList()
-            seqlevels(GRangesOfInterestList) <- names(ChrLengths)[k]
+            seqlevels(GRangesOfInterestList) <- names(ChrLengths)
          }
          
          if(!is.null(blklist)){
