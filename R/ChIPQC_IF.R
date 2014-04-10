@@ -11,7 +11,7 @@ ChIPQCsample = function(reads, peaks, annotation="hg19", chromosomes=NULL,
 }
 
 ChIPQC = function(experiment, annotation="hg19", chromosomes, samples, 
-                  consensus=TRUE, bCount=FALSE, mapQCth=15, blacklist=NULL, 
+                  consensus=FALSE, bCount=FALSE, mapQCth=15, blacklist=NULL, 
                   profileWin=400,fragmentLength=125,shifts=1:300,...) {
    
    if(class(experiment)=="character" || class(experiment)=="data.frame") {
@@ -112,7 +112,7 @@ ChIPQC = function(experiment, annotation="hg19", chromosomes, samples,
    addconsensus = FALSE
    addcontrols  = FALSE
    peaks=NA
-   if(!missing(consensus)) {
+   if(consensus!=FALSE) {
       addcontrols  = TRUE
       addconsensus = TRUE
       if(consensus!=TRUE) {

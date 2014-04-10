@@ -9,7 +9,7 @@ Constructs a new \code{\link{ChIPQCexperiment}} object.
 }
 \usage{
 ChIPQC(experiment, annotation="hg19", chromosomes, samples,
-       consensus=TRUE, bCount=FALSE, mapQCth=15, blacklist=NULL, 
+       consensus=FALSE, bCount=FALSE, mapQCth=15, blacklist=NULL, 
        profileWin=400, fragmentLength=125, shifts=1:300, ...)
 }
 
@@ -69,7 +69,7 @@ Specification of which chromosomes to use for computing QC statistics. If missin
 \code{list} of \code{ChIPCsample} objects. If present, the sample objects will be taken directly from this list instead of being computed using the \code{\link{ChIPQCsample}} constructor.
 }
 \item{consensus}{
-if \code{TRUE}, a consensus peakset will be generated and used for all samples. If \code{consensus} is a \code{\link{GRanges}} object with a consensus peakset, all samples will use this peakset, including control samples. By default, an automatically generated consensus peakset will be derived by merging overlapping peaks in all provided peaksets, and keeping any peaks that overlap in at least two samples.
+If \code{consensus} is a \code{\link{GRanges}} object, all samples will use this peakset when computing peak-based metrics. If \code{consensus=TRUE}, a consensus peakset will be generated and used for all samples, derived by merging overlapping peaks in all provided peaksets, keeping any peaks that overlap in at least two samples To avoid this behavior, set \code{consensus=FALSE}; this will result in only supplied peaksets being used for calculation of peak-based metrics (and no peak-based metric being computed for samples with no peakset specified, such as controls).
 }
 
 \item{bCount}{

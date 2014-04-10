@@ -274,7 +274,7 @@ Other parameters include \Rcode{mapQCth}, which represents a threshold for filte
 An optional \Rcode{blacklist} is a file or \Robject{GRanges} object with genomic intervals whereby reads in those regions will also be filtered out. 
 Use of blacklists can be very important in ChIP-seq data processing (\cite{Blacklist}), and should be applied for peak calling as well.
 
-For this example, some other features of \Rfunction{ChIPQC} are used as well. By setting \Rcode{consensus=TRUE}(which is the default), a consensus peak set will be derived,so that even the control samples can be compared to determine their relative enrichment in these regions. With \Rcode{bCounts=TRUE}, the peak scores will be computed by counting how many reads overlap these regions for every sample (include controls). 
+For this example, some other features of \Rfunction{ChIPQC} are used as well. By setting \Rcode{consensus=TRUE}, a consensus peak set will be derived,so that even the control samples can be compared to determine their relative enrichment in these regions. With \Rcode{bCounts=TRUE}, the peak scores will be computed by counting how many reads overlap these regions for every sample (include controls). 
 This feature relies on the \Rfunction{dba.count} of the \Biocpkg{DiffBind} package. By passing an extra parameter, \Rcode{summits=250}, through to \Rfunction{dba.count}, the peaks will include 250 basepairs upstream and downstream of the peak summit. 
 
 <<tamConstruct, eval=FALSE, keep.source=TRUE>>=
