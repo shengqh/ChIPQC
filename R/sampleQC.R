@@ -1,4 +1,5 @@
-sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAnnotation=NULL,Window=400,FragmentLength=50,shiftWindowStart=1,shiftWindowEnd=2,mapQCutoff=15,runCrossCor=FALSE){
+sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAnnotation=NULL,Window=400,FragmentLength=50,
+                     shiftWindowStart=1,shiftWindowEnd=2,mapQCutoff=15,runCrossCor=FALSE){
    #    require(Rsamtools)
    #    require(GenomicRanges)
    #    require(GenomicAlignments)

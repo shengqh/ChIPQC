@@ -31,6 +31,7 @@ showChIPQCexperiment = function (object){
       meta2 = cbind(meta2,meta$Control)
       colnames(meta2)[ncol(meta2)] = "Control"
    }
+   meta$Replicate[is.na(meta$Replicate)]=""
    if(!sum(meta$Replicate=="")) {
       meta2 = cbind(meta2,meta$Replicate)
       colnames(meta2)[ncol(meta2)] = "Replicate"

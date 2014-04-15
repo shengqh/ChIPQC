@@ -13,7 +13,7 @@ Generate an HTML summary QC report.
 
 \item{\code{signature(experiment = "ChIPQCexperiment", facet=TRUE, 
                       reportName="ChIPQC", reportFolder="ChIPQCreport",
-                      facetBy=c("Tissue","Factor"),colourBy=c("Replicate"))}}{
+                      facetBy=c("Tissue","Factor","Condition","Treatment"),colourBy=c("Replicate"))}}{
 
 Generates an summary QC report for the experiment in HTML format.
 
@@ -56,7 +56,7 @@ ChIPQCreport(exampleExp,facetBy=c("Tissue","Factor"))
 #report in ChIPQCreport/Example.html
 
 data(tamoxifen_QC)
-ChIPQCreport(tamoxifen,facetBy="Tissue")
+ChIPQCreport(tamoxifen,facetBy="Tissue",colourBy="Condition")
 #report in ChIPQCreport/ChIPQC.html
 
 ChIPQCreport(tamoxifen,facetBy=c("Tissue","Condition"))

@@ -302,7 +302,7 @@ setGeneric("ChIPQCreport", function(object="ChIPQCexperiment",facet=TRUE,
 
 setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
                                                        reportName="ChIPQC",reportFolder="ChIPQCreport",
-                                                       facetBy=c("Tissue","Factor"),
+                                                       facetBy=c("Tissue","Factor","Condition","Treatment"),
                                                        colourBy=c("Replicate"),
                                                        lineBy=NULL,
                                                        addMetaData=NULL

@@ -10,7 +10,7 @@ ChIPQCsample = function(reads, peaks, annotation="hg19", chromosomes=NULL,
    return(res)
 }
 
-ChIPQC = function(experiment, annotation="hg19", chromosomes, samples, 
+ChIPQC = function(experiment, annotation, chromosomes, samples, 
                   consensus=FALSE, bCount=FALSE, mapQCth=15, blacklist=NULL, 
                   profileWin=400,fragmentLength=125,shifts=1:300,...) {
    
@@ -58,22 +58,27 @@ ChIPQC = function(experiment, annotation="hg19", chromosomes, samples,
       }
    }
    
-   if(!is.null(annotation) && missing(samples)) {
-      if(class(annotation)!="list") {
-         message('Compiling annotation...')
-         annotation = getAnnotation(annotation,AllChr=chromosomes)
-      }
-      if(annotation$version=="hg19" && missing(blacklist)) {
-         blacklist = read.table(file.path(system.file("extdata", package="ChIPQC"),
-                                          "blacklist_hg19.bed"),header=TRUE)[,1:4]
-         blacklist = makeGRangesFromDataFrame(blacklist,ignore.strand=TRUE)
-         message("Using default blacklist for hg19...")
-      }
-   } else if(class(annotation)=="character") {
-      annotation = list(version=annotation)
+   if(!missing(annotation)) {
+       if(!is.null(annotation) && missing(samples)) {
+           if(class(annotation)!="list") {
+               message('Compiling annotation...')
+               annotation = getAnnotation(annotation,AllChr=chromosomes)
+           }
+           if(annotation$version=="hg19" && missing(blacklist)) {
+               blacklist = read.table(file.path(system.file("extdata", package="ChIPQC"),
+                                                "blacklist_hg19.bed"),header=TRUE)[,1:4]
+               blacklist = makeGRangesFromDataFrame(blacklist,ignore.strand=TRUE)
+               message("Using default blacklist for hg19...")
+           }
+       } else if(class(annotation)=="character") {
+           annotation = list(version=annotation)
+       } else {
+           annotation = list(version="none")
+       }
    } else {
-      annotation = list(version="none")
+       annotation = list(version="none")
    }
+   
    
    samplelist = NULL
    controlist = NULL
@@ -244,11 +249,24 @@ addMatchingSample = function(DBA,sampnum, meta,samples) {
       warning("Ambigious sample name: ",meta$ID)
       return(NULL)
    }
-   res = as.data.frame(peaks(samples[[sample]]))[,c(1:3,6)]
-   res[,4] = res[,4]/max(res[,4])
+   
+   res = as.data.frame(peaks(samples[[sample]]))
+   if(ncol(res)>=6) {
+      res = res[,c(1:3,6)]
+      res[,4] = res[,4]/max(res[,4])
+   } else {
+      res = res[,1:3]
+      if(nrow(res)>0) {
+        res = cbind(res,0)
+      } else {
+          res = matrix(0,0,4)
+      }
+   }
    colnames(res) = c("CHR","START","END","SCORE")
-   DBA$chrmap  = unique(c(DBA$chrmap,as.character(res[,1])))
-   res[,1] = factor(res[,1],DBA$chrmap) 
+   if(nrow(res)>0) {
+      DBA$chrmap  = unique(c(DBA$chrmap,as.character(res[,1])))
+      res[,1] = factor(res[,1],DBA$chrmap) 
+   }
    DBA$peaks[[sampnum]] = res
    return(DBA)
 }
