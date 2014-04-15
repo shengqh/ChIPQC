@@ -102,11 +102,11 @@ For this example, the main experiment is analyzed as follows:
 
 <<ex1Construct, eval=FALSE, keep.source=TRUE>>=
 
-exampleExp = ChIPQC(samples)
+exampleExp = ChIPQC(samples,annotaiton="hg19")
 exampleExp
 @
 
-By default, the "hg19" annotation will be used with a default blacklist, and only the first chromosome (in this case "chr22") will be examined.
+By default, the "hg19" annotation will use a default blacklist, and only the first chromosome (in this case "chr22") will be examined.
 
 For the purposes of this vignette, we can load a pre-computed version of this object:
 

@@ -8,7 +8,7 @@ Construct a \code{\link{ChIPQCexperiment}} object
 Constructs a new \code{\link{ChIPQCexperiment}} object.
 }
 \usage{
-ChIPQC(experiment, annotation="hg19", chromosomes, samples,
+ChIPQC(experiment, annotation, chromosomes, samples,
        consensus=FALSE, bCount=FALSE, mapQCth=15, blacklist=NULL, 
        profileWin=400, fragmentLength=125, shifts=1:300, ...)
 }
@@ -114,11 +114,11 @@ ChIPQC uses \code{\link{bplapply}} from the \code{\link{BiocParallel}} package t
 
 
 \examples{
-## Not run: exampleExp = ChIPQC(samples)
+## Not run: exampleExp = ChIPQC(samples,annotation="hg19")
 data(example_QCexperiment)
 exampleExp
 
-## Not run: tamoxifen = ChIPQC(samples, consensus=TRUE, bCounts=T)
+## Not run: tamoxifen = ChIPQC(samples, ,annotation="hg19", consensus=TRUE, bCounts=T)
 data(tamoxifen_QC)
 tamoxifen
 }
