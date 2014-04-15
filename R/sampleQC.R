@@ -73,8 +73,8 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
          Mapped <- sum(temp[temp[,"A"] != 1,"Freq"])
          Duplicates <- sum(temp[temp[,"A"] != 1 & temp[,"B"] == 1,"Freq"])
          
-         MapQPass <- sum(temp[temp[,"A"] != 1 & as.numeric(temp[,"C"]) >= 15,"Freq"])
-         MapQPassAndDup <- sum(temp[temp[,"A"] != 1 & temp[,"B"] == 1 & as.numeric(temp[,"C"]) >= mapQCutoff,"Freq"])
+         MapQPass <- sum(temp[temp[,"A"] != 1 & as.numeric(as.vector(temp[,"C"])) >= 15,"Freq"])
+         MapQPassAndDup <- sum(temp[temp[,"A"] != 1 & temp[,"B"] == 1 & as.numeric(as.vector(temp[,"C"])) >= mapQCutoff,"Freq"])
          FlagTagCounts <- rbind(cbind(UnMapped,Mapped,Duplicates,MapQPass,MapQPassAndDup),FlagTagCounts)
          
          
