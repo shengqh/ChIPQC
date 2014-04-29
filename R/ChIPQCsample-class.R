@@ -39,7 +39,7 @@ setMethod("fragmentlength", "ChIPQCsample", function(object,width){
    if(missing(width)) {
       width = readlength(object)
    }
-   MaxShift <- which.max(running(crosscoverage(object)[-c(1:2*readlength(object))],width=width,allow.fewer=TRUE))+2*readlength(object)
+   MaxShift <- which.max(running(crosscoverage(object)[-seq(1:(2*readlength(object)))],width=width,allow.fewer=TRUE))+2*readlength(object)
    return(unname(MaxShift))
 })
 

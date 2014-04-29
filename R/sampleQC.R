@@ -68,6 +68,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
          
          flagMapQ <- cbind(bamFlagAsBitMatrix(Sample_GIT$flag)[,c("isUnmappedQuery","isDuplicate")],Sample_GIT$mapq)
          colnames(flagMapQ) <- c("A","B","C")
+         flagMapQ[is.na(flagMapQ[,"C"]),"C"] <- Inf
          temp <- as.data.frame(xtabs(~A+B+C, data=flagMapQ))
          UnMapped <- sum(temp[temp[,"A"] == 1,"Freq"])
          Mapped <- sum(temp[temp[,"A"] != 1,"Freq"])
