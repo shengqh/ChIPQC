@@ -343,7 +343,7 @@ GetGRanges <- function(LoadFile,AllChr=NULL,ChrOfInterest=NULL,simple=FALSE,sepr
       }
    }else{
       if(class(LoadFile) == "character"){
-         RangesTable <- read.delim(LoadFile,sep=sepr,header=TRUE,skip="#")
+         RangesTable <- read.delim(LoadFile,sep=sepr,header=TRUE,comment="#")
       }else if(class(LoadFile) == "matrix"){
          RangesTable <- as.data.frame(LoadFile)
       } else{
