@@ -1,8 +1,10 @@
-importClassesFrom(GenomicRanges, GRanges, Seqinfo)
+import(methods)
 
 importClassesFrom(IRanges, DataFrame, IRanges, Rle)
 
-importClassesFrom(methods, character, list, numeric, oldClass)
+import(GenomeInfoDb)
+
+importClassesFrom(GenomicRanges, GRanges)
 
 importMethodsFrom(BiocGenerics, as.data.frame, as.vector, cbind,
                   colnames, duplicated, lapply, ncol, nrow, order,
@@ -13,17 +15,12 @@ importMethodsFrom(BiocParallel, bplapply)
 
 importMethodsFrom(GenomicAlignments, readGAlignmentsFromBam)
 
-importMethodsFrom(GenomicRanges, seqlengths, "seqlengths<-",
-                  "seqlevels<-", seqnames)
-
 importMethodsFrom(IRanges, "%in%", as.list, as.matrix, "colnames<-",
                   countOverlaps, coverage, elementMetadata,
                   "elementMetadata<-", end, flank, gsub, mean, median,
                   merge, ranges, reduce, resize, "rownames<-",
                   runLength, runValue, sd, shiftApply, start, t,
                   viewMaxs, viewApply, Views, which, which.max, width)
-
-importMethodsFrom(methods, show)
 
 importMethodsFrom(Rsamtools, scanBamHeader, ScanBamParam)
 
@@ -47,8 +44,6 @@ importFrom(grDevices, dev.off, png)
 importFrom(gtools, running)
 
 importFrom(IRanges, "%over%", IRanges)
-
-importFrom(methods, as, new)
 
 importFrom(Nozzle.R1, addTo, asLink, asStrong, newCustomReport,
            newFigure, newList, newParagraph, newSection, newSubSection,
