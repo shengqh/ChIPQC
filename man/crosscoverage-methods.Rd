@@ -16,7 +16,7 @@ Retrieve a \code{matrix} of cross-coverage data for all samples in an ChIP-seq e
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{
-Retrieve a \code{vector} of cross-coverage data for a sample. Each position in the vector corresponds to a shift size, with the value representing the cross-coverage using that size read.c.
+Retrieve a \code{vector} of cross-coverage data for a sample. Each position in the vector corresponds to a shift size, with the value representing the cross-coverage using that size read.
 }
 }}
 

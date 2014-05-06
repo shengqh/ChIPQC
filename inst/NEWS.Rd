@@ -2,6 +2,12 @@
 \title{ChIPQC News}
 \encoding{UTF-8}
 
+\section{Version 1.0.5}{
+ \itemize{
+  \item{Bugfixes and man page fixes}
+  }
+}
+
 \section{Version 1.0.1}{
  \itemize{
   \item{Changed defaults: annotation, facetBy}

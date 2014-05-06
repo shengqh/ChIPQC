@@ -5,13 +5,14 @@
 \alias{plotPrincomp,ChIPQCexperiment-method}
 \title{Generate Principal Components Analysis plot for ChIP samples}
 \description{
-Generate Principal Components Analysis plot for ChIP samples.
+Generate principal components analysis plot for ChIP samples.
 }
 \section{Methods}{
 \describe{
 
 \item{\code{signature(object = "ChIPQCexperiment", attributes, ...)}}{
-Generate Principal Components Analysis plot, for all the samples in an experiment that are associated with a peakset.
+
+Generate principal components analysis plot, for all the samples in an experiment that are associated with a peakset.
 \tabular{ll}{
 attributes \tab character string, or vector of character strings, representing metadata field names, for use grouping samples by color.\cr
 ... \tab additional parameters passed to \code{\link{dba.plotPCA}}\cr

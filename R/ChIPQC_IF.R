@@ -1,4 +1,4 @@
-ChIPQCsample = function(reads, peaks, annotation="hg19", chromosomes=NULL, 
+ChIPQCsample = function(reads, peaks, annotation, chromosomes=NULL, 
                         mapQCth=15, blacklist, profileWin=400,fragmentLength=125,shifts=1:300,runCrossCor=FALSE) {
    
    if(missing(peaks)) peaks=NULL

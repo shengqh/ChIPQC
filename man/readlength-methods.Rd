@@ -12,7 +12,7 @@ Retrieve read length values.
 \describe{
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
-Retrieve a \code{vector} of read length values one for each sample in an experiment.
+Retrieve a \code{vector} of read length values, one for each sample in an experiment.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

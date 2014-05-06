@@ -12,7 +12,7 @@ Retrieve an annotation description, or a processed annotation, from a \code{\lin
 \describe{
 
 \item{\code{signature(object = "ChIPQCexperiment", bRetrieve=FALSE)}}{
-Retrieve the annotation. If \code{bRetrieve=FALSE} (default), the character string describing the annotation if returned (currently only \dQuote{hg19} is supported). If \code{bRetrieve=TRUE}, a processed annotation is returned (in the form of a \code{list}). This can be used in subsequent calls to \code{\link{ChIPQC}} and/or \code{\link{ChIPQCsample}} for efficiency purposes. 
+Retrieve the annotation. If \code{bRetrieve=FALSE} (default), the character string describing the annotation is returned (currently only \dQuote{hg19} is supported). If \code{bRetrieve=TRUE}, a processed annotation is returned (in the form of a \code{list}). This can be used in subsequent calls to \code{\link{ChIPQC}} and/or \code{\link{ChIPQCsample}} for efficiency purposes. 
 }
 }}
 
