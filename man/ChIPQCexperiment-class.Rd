@@ -68,9 +68,11 @@ Class \code{"\linkS4class{list}"}.
         \item{ChIPQCreport}{\code{signature(object = "ChIPQCexperiment")}: see \code{\link{ChIPQCreport}}.} 
     }
 }
-\references{
-Frontiers paper?
-}
+
+%%\references{
+%%Frontiers paper?
+%%}
+
 \author{Thomas Carroll and Rory Stark}
 
 

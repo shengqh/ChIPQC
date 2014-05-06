@@ -13,7 +13,8 @@ Generate an HTML summary QC report.
 
 \item{\code{signature(experiment = "ChIPQCexperiment", facet=TRUE, 
                       reportName="ChIPQC", reportFolder="ChIPQCreport",
-                      facetBy=c("Tissue","Factor","Condition","Treatment"),colourBy=c("Replicate"))}}{
+                      facetBy=c("Tissue","Factor","Condition","Treatment"),
+                      colourBy=c("Replicate"))}}{
 
 Generates an summary QC report for the experiment in HTML format.
 
@@ -22,8 +23,8 @@ experiment \tab \code{\link{ChIPQCexperiment}} object\cr
 facet \tab logical indicating whether or not to facet using experimental metadata.\cr
 reportName \tab filename of main report file (.html).\cr
 reportFolder \tab directory name where plot graphics will be saved\cr
-facetBy \tab metadata fileds to use for faceting\cr
-colourBy \tab metadata feild to color by\cr
+facetBy \tab metadata fields to use for faceting\cr
+colourBy \tab metadata field to color by\cr
 }
 }
 

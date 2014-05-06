@@ -11,7 +11,7 @@ The \code{tamoxifen_QC} example data set contains a \code{\link{ChIPQCexperiment
 
 The \code{example_QCexperiment}  data set contains a \code{\link{ChIPQCexperiment}} object named \code{exampleExp}. This data set, derived from ENCODE data, includes 6 ChIP libraries. Only data for chromosome 22 (chr22) are included.
 
-\code{blacklist_hg19} data set includes a \code{\link{GRanges}} object named \code{blacklist,hg19} containing blacklisted regions for the human genome, derived from the UCSC blacklist.
+\code{blacklist_hg19} data set includes a \code{\link{GRanges}} object named \code{blacklist_hg19} containing blacklisted regions for the human genome, derived from the UCSC blacklist.
 }
 \usage{
 data(tamoxifen_QC)

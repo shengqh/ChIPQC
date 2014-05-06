@@ -6,13 +6,13 @@
 ChIPQC - Quality metrics for ChIPseq data
 }
 \description{
-ChIPQC analyzes aligned reads (in .bam format) for ChIP-seq samples and their associated controls, computing a variety of quality control metrics and statistics, and prividing reporting and plotting functions to enable asessment of experimental data for further analysis. 
+ChIPQC analyzes aligned reads (in .bam format) for ChIP-seq samples and their associated controls, computing a variety of quality control metrics and statistics, and providing reporting and plotting functions to enable assessment of experimental data for further analysis. 
 }
 \details{
 \tabular{ll}{
 Package: \tab ChIPQC\cr
 Type: \tab Package\cr
-Version: \tab 0.99.1\cr
+Version: \tab 0.1\cr
 Date: \tab 2014-03-01\cr
 License: \tab GPL3\cr
 }
@@ -31,5 +31,5 @@ Frontiers?
 }
 
 \seealso{
-\code{ChIPQC} is designed to work closely with the \code{\link{DiffBind}} package, which provides functionality for analyzing ChIP-seq experiments, inclduing performing differential binding analysis to identify signficantly differentially bound peaks.
+\code{ChIPQC} is designed to work closely with the \code{\link{DiffBind}} package, which provides functionality for analyzing ChIP-seq experiments, including performing differential binding analysis to identify significantly differentially bound peaks.
 }

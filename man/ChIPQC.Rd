@@ -29,7 +29,7 @@ Columns names in sample sheet may include:
 \item {bamReads:}       {file path for bam file containing aligned reads for ChIP sample}
 \item {bamControl:}     {file path for bam file containing aligned reads for control sample}
 \item {ControlID:}      {Identifier string for control sample}
-\item {Peaks:}  {path for file containing peaks for sample. format determined by PeakCaller field or caller parameter}
+\item {Peaks:}  {path for file containing peaks for sample. Format determined by PeakCaller field or caller parameter}
 \item {PeakCaller:}     {Identifier string for peak caller used. If Peaks is not a bed file, this will determine how the Peaks file is parsed. If missing, will use default peak caller specified in caller parameter. Possible values:}
 \itemize{
 \item {\dQuote{raw}:}   {text file file; peak score is in fourth column}
@@ -59,11 +59,11 @@ Either a character string indicating the genome and version to use as a genomic 
 \item {\dQuote{ce6} :} {C. Elgans, version 6}
 \item {\dQuote{dm3} :} {D. Melanogaster, version 3}
 }
-Alternatively, you can construct your own annotation; see the package Vignette for more information.
+Alternatively, you can construct your own annotation; see the package vignette for more information.
 }
 
 \item{chromosomes}{
-Specification of which chromosomes to use for computing QC statistics. If missing, the first chromosome on which has a peak is checked. If NULL, all chromosomes will be checked (which may be time-consuming). This can be a character string (e.g. \dQuote{chr18}) or a vector or list of character strings. If it is an integer or vector of integers, the chromosomes will be checked based on the order that they are listed in a peak set.
+Specification of which chromosomes to use for computing QC statistics. If missing, the first chromosome  which has a peak is checked. If NULL, all chromosomes will be checked (which may be time-consuming). This can be a character string (e.g. \dQuote{chr18}) or a vector or list of character strings. If it is an integer or vector of integers, the chromosomes will be checked based on the order that they are listed in a peak set.
 }
 \item{samples}{
 \code{list} of \code{ChIPCsample} objects. If present, the sample objects will be taken directly from this list instead of being computed using the \code{\link{ChIPQCsample}} constructor.
@@ -73,14 +73,14 @@ If \code{consensus} is a \code{\link{GRanges}} object, all samples will use this
 }
 
 \item{bCount}{
-if \code{TRUE},the peak scores for all samples will be based on read counts using \code{\link{dba.count}} using a consensus peakset. If \code{consenus} is missing, any samples (such as controls) that are not already associated with a peakset will be associated with the consensus peakset (if \code{consensus} is no missing, all samples will be associated with the consensus peakset). Note that the re-counting process may be time-consuming.
+if \code{TRUE}, the peak scores for all samples will be based on read counts using \code{\link{dba.count}} using a consensus peakset. If \code{consenus} is missing, any samples (such as controls) that are not already associated with a peakset will be associated with the consensus peakset (if \code{consensus} is not missing, all samples will be associated with the consensus peakset). Note that the re-counting process may be time-consuming.
 }
 
 \item{mapQCth}{
 An integer representing a mapping quality score threshold. Only reads with mapping quality scores above this threshold will be used for some statistics.
 }
 \item{blacklist}{
-A \code{\link{GRanges}} object or filename specifying a bed file containing genomic regions that should be excluded from the analysis. Is missing and the \code{annotation} is \dQuote{hg19}, a default blacklist, \code{\link{blacklist_hg19}} derived from the UCSC list, sill be used. No blacklist is used if this is set to NULL, or is left missing and the annotation is not \dQuote{hg19}.
+A \code{\link{GRanges}} object or filename specifying a bed file containing genomic regions that should be excluded from the analysis. If missing and the \code{annotation} is \dQuote{hg19}, a default blacklist, \code{\link{blacklist_hg19}} derived from the UCSC list, will be used. No blacklist is used if this is set to NULL, or is left missing and the annotation is not \dQuote{hg19}.
 }
 \item{profileWin}{
 An integer indicating the width, in base pairs, of the window to be used for peak profiles. Peaks will be centered on their summits, and include half the window size upstream and half downstream of this point.

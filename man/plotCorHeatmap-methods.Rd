@@ -5,7 +5,7 @@
 \alias{plotCorHeatmap,ChIPQCexperiment-method}
 \title{Generate Correlation Heatmap for ChIP samples}
 \description{
-Generates Correlation Heatmap for ChIP samples.
+Generates correlation heatmap for ChIP samples.
 }
 \section{Methods}{
 \describe{

@@ -39,7 +39,7 @@ setMethod("fragmentlength", "ChIPQCsample", function(object,width){
    if(missing(width)) {
       width = readlength(object)
    }
-   MaxShift <- which.max(running(crosscoverage(object)[-c(1:2*readlength(object))],width=width,allow.fewer=TRUE))+2*readlength(object)
+   MaxShift <- which.max(running(crosscoverage(object)[-seq(1:(2*readlength(object)))],width=width,allow.fewer=TRUE))+2*readlength(object)
    return(unname(MaxShift))
 })
 
@@ -102,6 +102,13 @@ setMethod("PropCountsInFeatures", "ChIPQCsample", function(object){
 setGeneric("regi", function(object="ChIPQCsample") standardGeneric("regi"))
 setMethod("regi", "ChIPQCsample", function(object){
    PropCountInFeatures <- data.frame(PropCountInFeatures=unlist(PropCountsInFeatures(object)),row.names=names(PropCountsInFeatures(object)))
+   if(sum(is.na(PropCountInFeatures))>0) {
+     #warning('No genomic features computed',call.=FALSE)
+     savenames = rownames(PropCountInFeatures)
+     PropCountInFeatures = PropCountInFeatures[,1]
+     names(PropCountInFeatures) = savenames
+     return(PropCountInFeatures)
+   }
    PropGenomeInFeatures <- data.frame(PropGenomeInFeature=unlist(PropGenomeInFeature(object)),row.names=names(PropGenomeInFeature(object)))
    regiFrame <- merge(PropCountInFeatures,PropGenomeInFeatures,by=0,all=FALSE,sort=FALSE)
    regi <- log2(regiFrame[,"PropCountInFeatures"]/regiFrame[,"PropGenomeInFeature"])

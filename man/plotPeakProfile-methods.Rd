@@ -6,7 +6,7 @@
 \alias{plotPeakProfile,ChIPQCsample-method}
 \title{Generate peak profile plots}
 \description{
-Generate Peak Profile plots.
+Generate peak profile plots.
 }
 \section{Methods}{
 \describe{

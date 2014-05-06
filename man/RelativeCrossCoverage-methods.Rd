@@ -6,7 +6,7 @@
 \alias{RelativeCrossCoverage,ChIPQCsample-method}
 \title{Retrieve the relative cross coverage values for a range of shift sizes}
 \description{
-Retrieve the relativecross coverage values for a range of shift sizes 
+Retrieve the relative cross-coverage values for a range of shift sizes 
 }
 \section{Methods}{
 \describe{
