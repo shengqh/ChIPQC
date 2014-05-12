@@ -456,7 +456,6 @@ setGeneric("plotRegi", function(object="ChIPQCexperiment",facet=TRUE,
 setMethod("plotRegi", "ChIPQCexperiment", function(object,facet=TRUE,
                                                    facetBy=c("Tissue","Factor"),
                                                    addMetaData=NULL){
-  browser()
   regiScores <- regi(object)
   hasna = apply(is.na(regiScores),2,sum)>0
   if(sum(hasna)==length(hasna)) {
@@ -495,7 +494,6 @@ setMethod("plotRegi", "ChIPQCexperiment", function(object,facet=TRUE,
 
 setMethod("plotRegi", "ChIPQCsample", function(object){
   ### PlaceHolder!
-  browser()
   regiScores <- regi(object)
   if(sum(is.na(regiScores))>0) {
     warning('No genomic annotation computed')
