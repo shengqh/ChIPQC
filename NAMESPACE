@@ -1,4 +1,3 @@
-importClassesFrom(GenomicRanges, GRanges, Seqinfo)
 
 importClassesFrom(IRanges, DataFrame, IRanges, Rle)
 
@@ -12,9 +11,6 @@ importMethodsFrom(BiocGenerics, as.data.frame, as.vector, cbind,
 importMethodsFrom(BiocParallel, bplapply)
 
 importMethodsFrom(GenomicAlignments, readGAlignmentsFromBam)
-
-importMethodsFrom(GenomicRanges, seqlengths, "seqlengths<-",
-                  "seqlevels<-", seqnames)
 
 importMethodsFrom(IRanges, "%in%", as.list, as.matrix, "colnames<-",
                   countOverlaps, coverage, elementMetadata,
@@ -33,8 +29,7 @@ importFrom(Biobase, selectSome)
 
 import(DiffBind)
 
-importFrom(GenomicRanges, GIntervalTree, GRanges, GRangesList,
-           makeGRangesFromDataFrame)
+import(GenomicRanges)
 
 importFrom(ggplot2, aes, aes_string, element_blank, element_text,
            facet_grid, facet_wrap, geom_bar, geom_boxplot, geom_line,
