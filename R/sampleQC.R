@@ -35,9 +35,13 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       
    }
    if(class(GeneAnnotation)=="list"){
+     
       GeneAnnotation <- GeneAnnotation[!names(GeneAnnotation) %in% "version"]
       GeneAnnotation <- lapply(GeneAnnotation,function(x)reduce(GetGRanges(x,names(ChrLengths))))
       GeneAnnotationTotalSizes <- unlist(lapply(GeneAnnotation,function(x)sum(width(x))))
+      if(length(GeneAnnotation[!names(GeneAnnotation) %in% "version"]) == 0){
+        GeneAnnotation <- NULL
+      }
    }
    if(file.exists(bamFile) & length(index(BamFile(bamFile))) == 0){
      message("Creating index for ",bamFile)

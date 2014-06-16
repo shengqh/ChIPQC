@@ -71,8 +71,8 @@ setMethod("plotCC", "ChIPQCexperiment", function(object,method="Coverage",facet=
   
   
   CCDataFrameWithMetaData <- merge(CCDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)
-  
   colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
+  CCDataFrameWithMetaData <- CCDataFrameWithMetaData[order(CCDataFrameWithMetaData[,c("Shift_Size")],decreasing=F),]
   
   Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)      
   Plot <- Plot + aes(group=Sample) +
