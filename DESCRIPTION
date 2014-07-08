@@ -1,7 +1,7 @@
 Package: ChIPQC
 Type: Package
 Title: Quality metrics for ChIPseq data
-Version: 1.1.5
+Version: 1.1.6
 Date: 2014-05-12
 Author: Tom Carroll, Wei Liu, Ines de Santiago, Rory Stark
 Maintainer: Tom Carroll <tc.infomatics@gmail.com>, Rory Stark <rory.stark@cruk.cam.ac.uk>
@@ -9,10 +9,11 @@ Description: Quality metrics for ChIPseq data
 biocViews: Sequencing, ChIPSeq, QualityControl, ReportWriting
 License: GPL (>= 3)
 LazyLoad: yes
-Depends: R (>= 3.0.0), ggplot2, DiffBind, GenomicRanges
-Imports: BiocGenerics (>= 0.8.0), Rsamtools (>= 1.14.2), 
-         chipseq (>= 1.12.0), GenomicAlignments (>= 0.99.2), 
-        gtools, BiocParallel, methods, IRanges, reshape2, Nozzle.R1, Biobase,grDevices, stats, utils
+Depends: R (>= 3.0.0), ggplot2, DiffBind, GenomicRanges (>= 1.17.19)
+Imports: BiocGenerics (>= 0.11.3), S4Vectors (>= 0.1.0), IRanges (>= 1.99.17),
+        Rsamtools (>= 1.17.28), GenomicAlignments (>= 1.1.16),
+        chipseq (>= 1.12.0), gtools, BiocParallel, methods, reshape2,
+        Nozzle.R1, Biobase, grDevices, stats, utils
 Suggests: BiocStyle, TxDb.Hsapiens.UCSC.hg19.knownGene, TxDb.Hsapiens.UCSC.hg18.knownGene,
           TxDb.Mmusculus.UCSC.mm10.knownGene, TxDb.Mmusculus.UCSC.mm9.knownGene,
           TxDb.Rnorvegicus.UCSC.rn4.ensGene, TxDb.Celegans.UCSC.ce6.ensGene, TxDb.Dmelanogaster.UCSC.dm3.ensGene 
