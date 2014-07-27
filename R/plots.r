@@ -71,8 +71,8 @@ setMethod("plotCC", "ChIPQCexperiment", function(object,method="Coverage",facet=
   
   
   CCDataFrameWithMetaData <- merge(CCDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)
+  
   colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
-  CCDataFrameWithMetaData <- CCDataFrameWithMetaData[order(CCDataFrameWithMetaData[,c("Shift_Size")],decreasing=F),]
   
   Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)      
   Plot <- Plot + aes(group=Sample) +
@@ -508,48 +508,51 @@ setMethod("plotRegi", "ChIPQCsample", function(object){
 
 #################################################################
 #################################################################
-setGeneric("plotSSD", function(object="ChIPQCexperiment",method="Coverage",facet=TRUE,
-                               facetBy=c("Tissue","Factor"),
-                               colourBy="Replicate",
-                               lineBy=NULL,
-                               addMetaData=NULL
-)
-  standardGeneric("plotSSD")
-)
+setGeneric("plotSSD", function(object="ChIPQCexperiment",facet=TRUE,
+                               facetBy=c("Tissue","Factor"),addMetaData=NULL)
+                               standardGeneric("plotSSD"))
 
-setMethod("plotSSD", "ChIPQCexperiment", function(object,method="Coverage",facet=TRUE,
-                                                  facetBy=c("Tissue","Factor"),                                                 
-                                                  colourBy="Replicate",
-                                                  lineBy=NULL,
-                                                  addMetaData=NULL
-){
+makeSSDPlot <- function(SSDDataFrame){
+  Plot <- ggplot(SSDDataFrame, aes(y = Sample,x=SSD,colour=Filter)) + 
+    geom_point(size=5)+xlim(0.1,4)
+  return(Plot)
+}
+
+
+setMethod("plotSSD", "ChIPQCsample", function(object,facet=TRUE,
+                                               facetBy=c("Tissue","Factor")){
+  ssd <- object@SSD
+  ssdBL <- object@SSDBL
+  #ssdBL[is.na(ssdBL)] <- ssd[is.na(ssdBL)] 
+  SSDDataFrame <- data.frame(
+    Sample=c("Sample","Sample"),
+    Filter=c("Pre_Blacklist","Post_Blacklist"),
+    SSD=c(ssd,ssdBL))
   
-  ssdvector <- ssd(object)
-  for(sample in names(ssdvector)){
-    input <- sample
-  }
+  Plot <- makeSSDPlot(SSDDataFrame)
+  return(Plot)
+})
+
+setMethod("plotSSD", "ChIPQCexperiment", function(object,facet=TRUE,
+                                              facetBy=c("Tissue","Factor"),addMetaData=NULL){
+  ssd <- unlist(lapply(QCsample(object),function(x) x@SSD))
+  ssdBL <- unlist(lapply(QCsample(object),function(x) x@SSDBL))
+  #ssdBL[is.na(ssdBL)] <- ssd[is.na(ssdBL)] 
+  SSDDataFrame <- data.frame(
+    Sample=names(ssdBL),
+    Pre_Blacklist=ssd,
+    Post_Blacklist=ssdBL)
+  meltedSSDDataFrame <- melt(SSDDataFrame)
+  metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)
+
+  SSDDataFrameWithMetaData <- merge(meltedSSDDataFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE)
+ 
+  facetGridForm <- as.formula(paste0(paste(names(metadataOpts$facetBy$facets),collapse="+"),"~."))
   
+  colnames(SSDDataFrameWithMetaData)[1:3] <- c("Sample","Filter","SSD")
   
-  
-  toMelt <- data.frame("Shift_Size"=seq(1,shiftlength),
-                       #"metadataOfInterest"=metadataOfInterest,
-                       ccvector)
-  CCDataFrame <- melt(toMelt,id.vars=c("Shift_Size"))
-  
-  
-  metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy,lineBy)        
-  
-  
-  CCDataFrameWithMetaData <- merge(CCDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)
-  
-  colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
-  
-  Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)      
-  Plot <- Plot + 
-    metadataOpts$facetBy +
-    metadataOpts$colour +
-    metadataOpts$lineType
-  
+  Plot <- makeSSDPlot(SSDDataFrameWithMetaData)      
+  Plot <- Plot +facet_grid(facetGridForm,scales="free_y")
   return(Plot)
 })
 

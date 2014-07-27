@@ -78,7 +78,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
          
          Sample_GIT <- GIntervalTree(GRanges(seqnames=seqnames(temp),ranges=ranges(temp),strand=strand(temp),elementMetadata(temp)))
          
-         flagMapQ <- cbind(bamFlagAsBitMatrix(Sample_GIT$flag)[,c("isUnmappedQuery","isDuplicate"),drop=F],Sample_GIT$mapq)
+         flagMapQ <- cbind(bamFlagAsBitMatrix(Sample_GIT$flag)[,c("isUnmappedQuery","isDuplicate"),drop=FALSE],Sample_GIT$mapq)
          colnames(flagMapQ) <- c("A","B","C")
          flagMapQ[is.na(flagMapQ[,"C"]),"C"] <- Inf
          temp <- as.data.frame(xtabs(~A+B+C, data=flagMapQ))
