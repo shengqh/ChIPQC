@@ -1,9 +1,8 @@
+import(S4Vectors)
 
-importClassesFrom(IRanges, DataFrame, IRanges)
+importClassesFrom(IRanges, IRanges)
 
 importClassesFrom(methods, character, list, numeric, oldClass)
-
-importClassesFrom(S4Vectors, Rle)
 
 importMethodsFrom(BiocGenerics, as.data.frame, as.vector, cbind,
                   colnames, duplicated, lapply, ncol, nrow, order,
@@ -23,9 +22,6 @@ importMethodsFrom(IRanges, as.list, as.matrix, "colnames<-",
 importMethodsFrom(methods, show)
 
 importMethodsFrom(Rsamtools, scanBamHeader, ScanBamParam)
-
-importMethodsFrom(S4Vectors, "%in%", elementMetadata, "elementMetadata<-",
-                  runLength, runValue)
 
 import(chipseq)
 
