@@ -1,10 +1,16 @@
-sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAnnotation=NULL,Window=400,FragmentLength=50,
-                     shiftWindowStart=1,shiftWindowEnd=2,mapQCutoff=15,runCrossCor=FALSE){
+sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAnnotation=NULL,Window=400,FragmentLength=150,
+                     shiftWindowStart=1,shiftWindowEnd=300,mapQCutoff=15,runCrossCor=FALSE){
   #    require(Rsamtools)
   #    require(GenomicRanges)
   #    require(GenomicAlignments)
   
   ChrLengths <- scanBamHeader(bamFile)[[1]]$targets
+  
+  if(length(ChrLengths[ChrLengths < shiftWindowEnd - shiftWindowStart]) > 0){
+    message("Removing ",length(ChrLengths[ChrLengths < shiftWindowEnd - shiftWindowStart]),
+            " chromosomes with length less than cross-coverage shift")
+    ChrLengths <- ChrLengths[!ChrLengths < shiftWindowEnd - shiftWindowStart]
+  }
   message("Bam file has ",length(names(ChrLengths))," contigs")
   if(!all(ChrOfInterest %in% names(ChrLengths))){
     stop("Contigs of interest are not all in Bam file!!")
@@ -85,7 +91,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       
       Cov <- coverage(Sample_GIT,width=unname(ChrLengths[k]))
       message("Calculating coverage histogram for ",names(ChrLengths)[k],"\n")
-      CovHist <- c(CovHist,list(colSums(table(Cov))))
+      CovHist <- c(CovHist,list(table(Cov[[which(names(Cov) %in% names(ChrLengths)[k])]])))
       message("Calculating SSD for ",names(ChrLengths)[k],"\n")
       SSD <- c(SSD,sd(Cov)[names(ChrLengths)[k]])
       
