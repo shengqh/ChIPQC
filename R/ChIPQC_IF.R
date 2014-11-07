@@ -188,9 +188,9 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
       for(sampname in names(samplelist)) {
          whichsamp = which(names(samples) %in% sampname) 
          if(length(whichsamp)==0) {
-            stop(sprintf("Sample %d missing from sample list",sampname))
+            stop(sprintf("Sample %s missing from sample list",sampname))
          } else if(length(whichsamp)>1) {
-            stop(sprintf("Sample %d appears more than once in sample list",sampname))
+            stop(sprintf("Sample %s appears more than once in sample list",sampname))
          }
          newsamps = listadd(newsamps,samples[[whichsamp]])
          names(newsamps)[length(newsamps)]=sampname

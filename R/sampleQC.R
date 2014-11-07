@@ -171,6 +171,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
         bedRangesTemp <- c(bedRangesTemp,bedRanges)
         message("Signal over peaks for ",names(ChrLengths)[k],"\n")                   
         AllFragRanges <- resize(as(Sample_GIT[Sample_GIT %over% bedRanges],"GRanges"),FragmentLength,"start")
+        AllFragRanges <- AllFragRanges[!(start(AllFragRanges) < 0 | end(AllFragRanges) > ChrLengths[k])]
         bedRangesSummits <- findCovMaxPos(AllFragRanges,bedRanges,ChrLengths[k],FragmentLength)
         bedRangesSummitsTemp <- c(bedRangesSummitsTemp,as.numeric(as.vector(start(bedRangesSummits))))
         updatedRanges  <- resize(bedRangesSummits,Window,"center")
