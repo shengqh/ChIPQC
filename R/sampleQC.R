@@ -47,7 +47,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
     
     Param <- ScanBamParam(which=GRanges(seqnames=names(ChrLengths)[k],IRanges(start=1,end=unname(ChrLengths[names(ChrLengths) == names(ChrLengths)[k]])-shiftWindowEnd)),
                           what=c("flag","mapq"))
-    temp <- readGAlignmentsFromBam(bamFile,param=Param)
+    temp <- readGAlignments(bamFile,param=Param)
     if(length(temp) < 1){
       
       emptyChr_SSD <- 0

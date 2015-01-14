@@ -11,7 +11,7 @@ importMethodsFrom(BiocGenerics, as.data.frame, as.vector, cbind,
 
 importMethodsFrom(BiocParallel, bplapply)
 
-importMethodsFrom(GenomicAlignments, readGAlignmentsFromBam)
+importMethodsFrom(GenomicAlignments, readGAlignments)
 
 importMethodsFrom(IRanges, as.list, as.matrix, "colnames<-",
                   countOverlaps, coverage, end, flank, gsub, mean, median,
