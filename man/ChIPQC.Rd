@@ -51,10 +51,11 @@ See the documentation for the \code{sampleSheet} parameter of \code{\link{dba}} 
 \item{annotation}{
 Either a character string indicating the genome and version to use as a genomic annotation, or a previously defined annotation (obtained using \code{\link{QCannotation}} on a previously defined \code{\link{ChIPQCexperiment}} object.)  May be left unspecified, in which case no genomic feature analysis is performed. The following annotation specifiers are supported:
 \itemize{
+\item {\dQuote{hg38}:} {Human, version 38}
 \item {\dQuote{hg19}:} {Human, version 19}
 \item {\dQuote{hg18}:} {Human, version 18}
 \item {\dQuote{mm10}:} {Mouse, version 10}
-\item {\dQuote{mm9} :} {Mouse, version 19}
+\item {\dQuote{mm9} :} {Mouse, version 9}
 \item {\dQuote{rn4} :} {Rat, version 4}
 \item {\dQuote{ce6} :} {C. Elgans, version 6}
 \item {\dQuote{dm3} :} {D. Melanogaster, version 3}
