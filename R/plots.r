@@ -74,6 +74,10 @@ setMethod("plotCC", "ChIPQCexperiment", function(object,method="Coverage",facet=
   
   colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
   
+  CCDataFrameWithMetaData[,"Shift_Size"] <- as.numeric(as.vector(CCDataFrameWithMetaData[,"Shift_Size"]))
+  CCDataFrameWithMetaData <- CCDataFrameWithMetaData[order(
+    CCDataFrameWithMetaData[,"Sample"],CCDataFrameWithMetaData[,"Shift_Size"]   
+    ,decreasing=F),]
   Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)      
   Plot <- Plot + aes(group=Sample) +
     metadataOpts$facetBy +
@@ -209,7 +213,9 @@ setMethod("plotCoverageHist", "ChIPQCexperiment", function(object,maxDepthToPlot
   covHistFrameWithMetaData <- merge(covHistFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE)      
   
   colnames(covHistFrameWithMetaData)[1:3] <- c("Sample","Depth","log10_bp")
-  
+  covHistFrameWithMetaData <- covHistFrameWithMetaData[order(
+    covHistFrameWithMetaData[,"Sample"],covHistFrameWithMetaData[,"Depth"]   
+    ,decreasing=F),]  
   
   
   Plot <- makeCoveragePlot(covHistFrameWithMetaData,maxDepthToPlot)

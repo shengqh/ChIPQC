@@ -28,13 +28,6 @@ Retrieve a \code{vector} of cross-coverage data for a sample. Each position in t
 }
 \examples{
 data(example_QCexperiment)
-CTCFcoverage = crosscoverage(QCsample(exampleExp,1))
-length(CTCFcoverage)
-plot(CTCFcoverage,type='l',
-     ylab="Cross-coverage",
-     xlab="Fragment length") 
-
-allcoverages = crosscoverage(exampleExp)
-dim(allcoverages)
-for(i in 1:ncol(allcoverages)) lines(allcoverages[,i],col=i)
+head(crosscoverage(exampleExp))
+plotCC(exampleExp)
 }

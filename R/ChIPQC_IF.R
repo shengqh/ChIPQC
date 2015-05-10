@@ -209,7 +209,7 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
 
 doChIPQCsample = function(sample,DBA,chromosomes, annotation, 
                           mapQCth, blacklist, profileWin,fragmentLength,shifts) {
-   
+   message(class(sample))
    res = ChIPQCsample(reads   = sample$bam,
                       peaks   = sample$peaks,
                       chromosomes=chromosomes,annotation=annotation,

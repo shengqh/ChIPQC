@@ -28,12 +28,6 @@ Retrieve a \code{vector} representing coverage histogram data for a sample. Valu
 }
 \examples{
 data(example_QCexperiment)
-CTCFcoverage = coveragehistogram(QCsample(exampleExp,1))
-length(CTCFcoverage)
-plot(log10(CTCFcoverage),type='l',ylab="log10 Density",
-                          xlab="Pileup")
-
-allcoverages = coveragehistogram(exampleExp)
-dim(allcoverages)
-for(i in 1:ncol(allcoverages)) lines(log10(allcoverages[,i]),col=i)
+head(coveragehistogram(exampleExp))
+plotCoverageHist(exampleExp)
 }
