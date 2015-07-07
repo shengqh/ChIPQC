@@ -178,6 +178,17 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
       samples = bplapply(samplelist,doChIPQCsample,experiment,chromosomes, annotation, 
                          mapQCth, blacklist, profileWin,fragmentLength,shifts)
       names(samples) = names(samplelist)
+      errors = FALSE
+      for(i in 1:length(samples)) {
+        sample = samples[[i]]
+        if(class(sample) != "ChIPQCsample") {
+          message("Error in sample ",names(samples)[i],": ",sample[1])
+          errors = TRUE
+        }
+      }
+      if(errors) {
+        stop("Errors in generating sample data.")
+      }
    } else {
       if(length(samples) < length(samplelist)) {
          stop('Not enough samples!')
