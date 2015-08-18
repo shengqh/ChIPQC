@@ -402,7 +402,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
     gsub(">",paste0("id=\"summary_",htmlID,"\">"),html[grep(">QC files and versions<",html)+6])          
   
   write(html,file=file.path(reportFolder,paste(reportName,"html",sep=".")))
-  browser <- browseURL(paste0("file://",normalizePath(file.path(reportFolder,paste(reportName,"html",sep=".")))))
+  if (interactive()) browseURL(paste0("file://",normalizePath(file.path(reportFolder,paste(reportName,"html",sep=".")))))
   
 })
 
@@ -499,6 +499,6 @@ setMethod("ChIPQCreport", "ChIPQCsample", function(object,
     gsub(">",paste0("id=\"summary_",htmlID,"\">"),html[grep(">QC files and versions<",html)+6])          
   
   write(html,file=file.path(reportFolder,paste(reportName,"html",sep=".")))
-  browser <- browseURL(paste0("file://",normalizePath(file.path(reportFolder,paste(reportName,"html",sep=".")))))
+  if (interactive()) browseURL(paste0("file://",normalizePath(file.path(reportFolder,paste(reportName,"html",sep=".")))))
   
 })
