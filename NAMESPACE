@@ -100,7 +100,8 @@ exportMethods(
     "duplicateRate",
     "plotCorHeatmap",
     "plotPrincomp",
-    "ChIPQCreport"
+    "ChIPQCreport",
+    "plotSSD"
 )
 exportClasses(
     "ChIPQCsample", 

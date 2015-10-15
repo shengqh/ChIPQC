@@ -5,6 +5,12 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
   #    require(GenomicAlignments)
   
   ChrLengths <- scanBamHeader(bamFile)[[1]]$targets
+  
+  if(length(ChrLengths[ChrLengths < shiftWindowEnd - shiftWindowStart]) > 0){
+    message("Removing ",length(ChrLengths[ChrLengths < shiftWindowEnd - shiftWindowStart]),
+            " chromosomes with length less than cross-coverage shift")
+    ChrLengths <- ChrLengths[!ChrLengths < shiftWindowEnd - shiftWindowStart]
+  }
   message("Bam file has ",length(names(ChrLengths))," contigs")
   if(!all(ChrOfInterest %in% names(ChrLengths))){
     stop("Contigs of interest are not all in Bam file!!")
@@ -41,6 +47,11 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
     } else {
       GeneAnnotation=NULL
     }
+  }
+  if(file.exists(bamFile) & length(index(BamFile(bamFile))) == 0){
+    message("Creating index for ",bamFile)
+    indexBam(bamFile)
+    message("..done")
   }
   
   for(k in 1:length(ChrLengths)){
@@ -85,7 +96,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       
       Cov <- coverage(Sample_GIT,width=unname(ChrLengths[k]))
       message("Calculating coverage histogram for ",names(ChrLengths)[k],"\n")
-      CovHist <- c(CovHist,list(colSums(table(Cov))))
+      CovHist <- c(CovHist,list(table(Cov[[which(names(Cov) %in% names(ChrLengths)[k])]])))
       message("Calculating SSD for ",names(ChrLengths)[k],"\n")
       SSD <- c(SSD,sd(Cov)[names(ChrLengths)[k]])
       
@@ -427,6 +438,9 @@ getAnnotation = function(GeneAnnotation="hg19",AllChr){
     } else if(GeneAnnotation == "hg18"){
       require(TxDb.Hsapiens.UCSC.hg18.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene        
+    } else if(GeneAnnotation == "hg38"){
+      require(TxDb.Hsapiens.UCSC.hg38.knownGene)
+      txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene        
     } else if(GeneAnnotation == "mm10"){
       require(TxDb.Mmusculus.UCSC.mm10.knownGene)
       txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene        
