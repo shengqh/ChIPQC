@@ -159,7 +159,7 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
          warning('Samples and peaksets out of sync')
       }
    }
-   if(nrow(experiment$allvectors)>0) {
+   if(nrow(experiment$merged)>0) {
       peaks = dba.peakset(experiment,bRetrieve=TRUE)
    } else peaks = NULL
    

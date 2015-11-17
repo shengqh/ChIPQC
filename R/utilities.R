@@ -35,10 +35,9 @@ extend = function(vec,len,bNAasZero=TRUE) {
 
 QCminimize = function(obj) {
    obj@annotation = list(version=QCannotation(obj))
-   obj@DBA$vectors=NULL
-   obj@DBA$allvectors=NULL
-   obj@DBA$overlapping=NULL
-   obj@DBA$sites=NULL
+   obj@DBA$binding=NULL
+   obj@DBA$merged=NULL
+   obj@DBA$called=NULL
    
    gc()
    res = obj
