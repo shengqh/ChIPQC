@@ -1,11 +1,33 @@
+table_RleList <- function(x)
+{
+  nbins <- max(max(x)) + 1L
+  data <- lapply(x,
+                 function(xi)
+                   S4Vectors:::tabulate2(runValue(xi) + 1L, nbins,
+                                         weight=runLength(xi)))
+  ans <- matrix(unlist(data, use.names=FALSE),
+                nrow=length(x), byrow=TRUE)
+  dimnames(ans) <- list(names(x), 0:(nbins-1L))
+  class(ans) <- "table"
+  ans
+}
+
 sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAnnotation=NULL,Window=400,FragmentLength=50,
-                     shiftWindowStart=1,shiftWindowEnd=2,mapQCutoff=15,runCrossCor=FALSE){
+                     shiftWindowStart=1,shiftWindowEnd=2,mapQCutoff=15,runCrossCor=FALSE,verboseT=TRUE){
   #    require(Rsamtools)
   #    require(GenomicRanges)
   #    require(GenomicAlignments)
   
   ChrLengths <- scanBamHeader(bamFile)[[1]]$targets
-  message("Bam file has ",length(names(ChrLengths))," contigs")
+  
+  if(length(ChrLengths[ChrLengths < shiftWindowEnd - shiftWindowStart]) > 0){
+    message("Removing ",length(ChrLengths[ChrLengths < shiftWindowEnd - shiftWindowStart]),
+            " chromosomes with length less than cross-coverage shift")
+    ChrLengths <- ChrLengths[!ChrLengths < shiftWindowEnd - shiftWindowStart]
+  }
+  if(verboseT == T){
+    message("Bam file has ",length(names(ChrLengths))," contigs")
+  }
   if(!all(ChrOfInterest %in% names(ChrLengths))){
     stop("Contigs of interest are not all in Bam file!!")
   }
@@ -42,6 +64,11 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       GeneAnnotation=NULL
     }
   }
+  if(file.exists(bamFile) & length(index(BamFile(bamFile))) == 0){
+    message("Creating index for ",bamFile)
+    indexBam(bamFile)
+    message("..done")
+  }
   
   for(k in 1:length(ChrLengths)){
     
@@ -70,7 +97,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       
       Sample_GIT <- GNCList(GRanges(seqnames=seqnames(temp),ranges=ranges(temp),strand=strand(temp),elementMetadata(temp)))
       
-      flagMapQ <- cbind(bamFlagAsBitMatrix(Sample_GIT$flag)[,c("isUnmappedQuery","isDuplicate")],Sample_GIT$mapq)
+      flagMapQ <- cbind(bamFlagAsBitMatrix(Sample_GIT$flag)[,c("isUnmappedQuery","isDuplicate"),drop=FALSE],Sample_GIT$mapq)
       colnames(flagMapQ) <- c("A","B","C")
       flagMapQ[is.na(flagMapQ[,"C"]),"C"] <- Inf
       temp <- as.data.frame(xtabs(~A+B+C, data=flagMapQ))
@@ -83,22 +110,39 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       FlagTagCounts <- rbind(cbind(UnMapped,Mapped,Duplicates,MapQPass,MapQPassAndDup),FlagTagCounts)
       
       
+      MapQPass <- sum(temp[temp[,"A"] != 1 & as.numeric(as.vector(temp[,"C"])) >= 15,"Freq"])
+      MapQPassAndDup <- sum(temp[temp[,"A"] != 1 & temp[,"B"] == 1 & as.numeric(as.vector(temp[,"C"])) >= mapQCutoff,"Freq"])
+      FlagTagCounts <- rbind(cbind(UnMapped,Mapped,Duplicates,MapQPass,MapQPassAndDup),FlagTagCounts)
+      
+      
       Cov <- coverage(Sample_GIT,width=unname(ChrLengths[k]))
-      message("Calculating coverage histogram for ",names(ChrLengths)[k],"\n")
-      CovHist <- c(CovHist,list(colSums(table(Cov))))
-      message("Calculating SSD for ",names(ChrLengths)[k],"\n")
+      if(verboseT == T){
+        
+        message("Calculating coverage histogram for ",names(ChrLengths)[k],"\n")
+        
+      }
+      
+      CovHist <- c(CovHist,list(colSums(table_RleList(Cov))))
+      if(verboseT == T){
+        
+        message("Calculating SSD for ",names(ChrLengths)[k],"\n")
+        
+      }
       SSD <- c(SSD,sd(Cov)[names(ChrLengths)[k]])
       
       PosCoverage <- coverage(IRanges(start(Sample_GIT[strand(Sample_GIT)=="+"]),start(Sample_GIT[strand(Sample_GIT)=="+"])),width=ChrLengths[k])
       NegCoverage <- coverage(IRanges(end(Sample_GIT[strand(Sample_GIT)=="-"]),end(Sample_GIT[strand(Sample_GIT)=="-"])),width=ChrLengths[k])
-      message("Calculating shift for ",names(ChrLengths)[k],"\n")
+      if(verboseT == T){
+        
+        message("Calculating shift for ",names(ChrLengths)[k],"\n")
+      }
       #ShiftsTemp <- shiftApply(seq(shiftWindowStart,shiftWindowEnd),PosCoverage,NegCoverage,cor)
       
-      ShiftsTemp <- shiftApply(seq(shiftWindowStart,shiftWindowEnd),PosCoverage,NegCoverage,RleSumAny, verbose = TRUE)         
+      ShiftsTemp <- shiftApply(seq(shiftWindowStart,shiftWindowEnd),PosCoverage,NegCoverage,RleSumAny, verbose = verboseT)         
       ShiftMat <- cbind(ShiftMat,ShiftsTemp)
       colnames(ShiftMat)[ncol(ShiftMat)] <- names(ChrLengths)[k]
       if(runCrossCor==TRUE){
-        ShiftsCorTemp <- shiftApply(seq(shiftWindowStart,shiftWindowEnd),PosCoverage,NegCoverage,cor, verbose = TRUE)         
+        ShiftsCorTemp <- shiftApply(seq(shiftWindowStart,shiftWindowEnd),PosCoverage,NegCoverage,cor, verbose = verboseT)         
         ShiftMatCor <- cbind(ShiftMatCor,ShiftsCorTemp)
         colnames(ShiftMatCor)[ncol(ShiftMatCor)] <- names(ChrLengths)[k]
       }
@@ -157,13 +201,19 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       }
       GRangesOfInterestList <- GRangesOfInterestList
       MultiRangesCountsTemp <- c(MultiRangesCountsTemp,countOverlaps(GRangesOfInterestList,Sample_GIT))
-      message("Counting reads in features for ",names(ChrLengths)[k],"\n")        
+      if(verboseT == T){
+        
+        message("Counting reads in features for ",names(ChrLengths)[k],"\n")        
+      }
       if(!is.null(bedFile)){
         CountsTemp <- countOverlaps(bedRanges,Sample_GIT)
         Counts  <- c(Counts,CountsTemp)
         
         bedRangesTemp <- c(bedRangesTemp,bedRanges)
-        message("Signal over peaks for ",names(ChrLengths)[k],"\n")                   
+        if(verboseT == T){
+          
+          message("Signal over peaks for ",names(ChrLengths)[k],"\n")                   
+        }
         AllFragRanges <- resize(as(Sample_GIT[Sample_GIT %over% bedRanges],"GRanges"),FragmentLength,"start")
         bedRangesSummits <- findCovMaxPos(AllFragRanges,bedRanges,ChrLengths[k],FragmentLength)
         bedRangesSummitsTemp <- c(bedRangesSummitsTemp,as.numeric(as.vector(start(bedRangesSummits))))
@@ -424,10 +474,13 @@ getAnnotation = function(GeneAnnotation="hg19",AllChr){
     if(GeneAnnotation == "hg19"){
       require(TxDb.Hsapiens.UCSC.hg19.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-    } else if(GeneAnnotation == "hg18"){
+    } else if(GeneAnnotation == "hg20"){
+      require(TxDb.Hsapiens.UCSC.hg20.knownGene)
+      txdb <- TxDb.Hsapiens.UCSC.hg20.knownGene        
+    }else if(GeneAnnotation == "hg18"){
       require(TxDb.Hsapiens.UCSC.hg18.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene        
-    } else if(GeneAnnotation == "mm10"){
+    }else if(GeneAnnotation == "mm10"){
       require(TxDb.Mmusculus.UCSC.mm10.knownGene)
       txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene        
     } else if(GeneAnnotation == "mm9"){

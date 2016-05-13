@@ -1,13 +1,13 @@
-ChIPQCsample = function(reads, peaks, annotation, chromosomes=NULL, 
-                        mapQCth=15, blacklist, profileWin=400,fragmentLength=125,shifts=1:300,runCrossCor=FALSE) {
-   
-   if(missing(peaks)) peaks=NULL
-   if(missing(blacklist)) blacklist=NULL
-   res = sampleQC(bamFile=reads, bedFile=peaks, GeneAnnotation=annotation,blklist=blacklist,ChrOfInterest=chromosomes,
-                  Window=profileWin,FragmentLength=fragmentLength,
-                  shiftWindowStart=min(shifts),shiftWindowEnd=max(shifts),runCrossCor=runCrossCor)
-   
-   return(res)
+ChIPQCsample = function(reads, peaks, annotation=NULL, chromosomes=NULL, 
+                        mapQCth=15, blacklist, profileWin=400,fragmentLength=125,shifts=1:300,runCrossCor=FALSE,verboseT=TRUE) {
+  
+  if(missing(peaks)) peaks=NULL
+  if(missing(blacklist)) blacklist=NULL
+  res = sampleQC(bamFile=reads, bedFile=peaks, GeneAnnotation=annotation,blklist=blacklist,ChrOfInterest=chromosomes,
+                 Window=profileWin,FragmentLength=fragmentLength,
+                 shiftWindowStart=min(shifts),shiftWindowEnd=max(shifts),runCrossCor=runCrossCor,verboseT=verboseT)
+  
+  return(res)
 }
 
 ChIPQC = function(experiment, annotation, chromosomes, samples, 
