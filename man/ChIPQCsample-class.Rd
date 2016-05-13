@@ -19,7 +19,7 @@ Objects can be created using the \code{\link{ChIPQCsample}} function.
 \code{
 ChIPQCsample(reads, peaks, annotation, chromosomes = NULL, mapQCth = 15, 
              blacklist, profileWin = 400, fragmentLength = 125, shifts = 1:300, 
-             runCrossCor = FALSE)
+             runCrossCor = FALSE,verboseT=FALSE)
 }
 \itemize{
   \item{\code{reads}}{character string filename of .bam file}
@@ -30,6 +30,7 @@ ChIPQCsample(reads, peaks, annotation, chromosomes = NULL, mapQCth = 15,
 Either a character string indicating the genome and version to use as a genomic annotation, or a previously defined annotation (obtained using \code{\link{QCannotation}} on a previously defined \code{\link{ChIPQCexperiment}} object.)  May be left unspecified, in which case no genomic feature analysis is performed. The following annotation specifiers are supported:
 
 \tabular{ll}{
+"hg20" \tab Human, version 20 \cr
 "hg19" \tab Human, version 19 \cr
 "hg18" \tab Human, version 18 \cr
 "mm10" \tab Mouse, version 10 \cr
@@ -63,6 +64,9 @@ A vector of values to try when computing optimal shift sizes.
 }
   \item{\code{runCrossCor}}{
 Compute cross-correlation in addition to cross-coverage. This will take more compute time, and is currently not used in the final report.
+}
+  \item{\code{verboseT}}{
+  TRUE or FALSE, specifying whether to report progress. Default is TRUE. When set to FALSE ChIPQC does not report any progress until complete.
 }
 }
 }
@@ -126,7 +130,7 @@ Class \code{"\linkS4class{GRanges}"}
     }
 }
 \references{
-Frontiers paper?
+Carroll TS, Liang Z, Salama R, Stark R and Santiago Id (in press). “Impact of artefact removal on ChIP quality metrics in ChIP-seq and ChIP-exo data.” Frontiers in Genetics.
 }
 \author{Thomas Carroll and Rory Stark}
 

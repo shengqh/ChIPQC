@@ -51,7 +51,7 @@ importFrom(Nozzle.R1, addTo, asLink, asStrong, newCustomReport,
 
 importFrom(reshape2, melt)
 
-importFrom(Rsamtools, bamFlagAsBitMatrix)
+importFrom(Rsamtools, bamFlagAsBitMatrix, BamFile, index, indexBam)
 
 importFrom(stats, as.formula, formula, weighted.mean)
 
