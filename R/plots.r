@@ -508,50 +508,50 @@ setMethod("plotRegi", "ChIPQCsample", function(object){
 
 #################################################################
 #################################################################
-setGeneric("plotSSD", function(object="ChIPQCexperiment",method="Coverage",facet=TRUE,
-                               facetBy=c("Tissue","Factor"),
-                               colourBy="Replicate",
-                               lineBy=NULL,
-                               addMetaData=NULL
-)
-  standardGeneric("plotSSD")
-)
-
-setMethod("plotSSD", "ChIPQCexperiment", function(object,method="Coverage",facet=TRUE,
-                                                  facetBy=c("Tissue","Factor"),                                                 
-                                                  colourBy="Replicate",
-                                                  lineBy=NULL,
-                                                  addMetaData=NULL
-){
-  
-  ssdvector <- ssd(object)
-  for(sample in names(ssdvector)){
-    input <- sample
-  }
-  
-  
-  
-  toMelt <- data.frame("Shift_Size"=seq(1,shiftlength),
-                       #"metadataOfInterest"=metadataOfInterest,
-                       ccvector)
-  CCDataFrame <- melt(toMelt,id.vars=c("Shift_Size"))
-  
-  
-  metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy,lineBy)        
-  
-  
-  CCDataFrameWithMetaData <- merge(CCDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)
-  
-  colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
-  
-  Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)      
-  Plot <- Plot + 
-    metadataOpts$facetBy +
-    metadataOpts$colour +
-    metadataOpts$lineType
-  
-  return(Plot)
-})
+# setGeneric("plotSSD", function(object="ChIPQCexperiment",method="Coverage",facet=TRUE,
+#                                facetBy=c("Tissue","Factor"),
+#                                colourBy="Replicate",
+#                                lineBy=NULL,
+#                                addMetaData=NULL
+# )
+#   standardGeneric("plotSSD")
+# )
+# 
+# setMethod("plotSSD", "ChIPQCexperiment", function(object,method="Coverage",facet=TRUE,
+#                                                   facetBy=c("Tissue","Factor"),                                                 
+#                                                   colourBy="Replicate",
+#                                                   lineBy=NULL,
+#                                                   addMetaData=NULL
+# ){
+#   
+#   ssdvector <- ssd(object)
+#   for(sample in names(ssdvector)){
+#     input <- sample
+#   }
+#   
+#   
+#   
+#   toMelt <- data.frame("Shift_Size"=seq(1,shiftlength),
+#                        #"metadataOfInterest"=metadataOfInterest,
+#                        ccvector)
+#   CCDataFrame <- melt(toMelt,id.vars=c("Shift_Size"))
+#   
+#   
+#   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy,lineBy)        
+#   
+#   
+#   CCDataFrameWithMetaData <- merge(CCDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)
+#   
+#   colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
+#   
+#   Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)      
+#   Plot <- Plot + 
+#     metadataOpts$facetBy +
+#     metadataOpts$colour +
+#     metadataOpts$lineType
+#   
+#   return(Plot)
+# })
 
 #################################################################
 #################################################################

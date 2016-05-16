@@ -23,7 +23,7 @@ Generate reads in peaks plots for a sample.
 }}
 
 \note{
-plotRap uses \code{\link{ggplot2}} for plotting, and returns a \code{ggplot2} plot dataframe.
+plotRap uses \code{ggplot2} for plotting, and returns a \code{ggplot2} plot dataframe.
 }
 
 \keyword{methods}

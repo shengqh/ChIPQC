@@ -130,7 +130,7 @@ Class \code{"\linkS4class{GRanges}"}
     }
 }
 \references{
-Carroll TS, Liang Z, Salama R, Stark R and Santiago Id (in press). “Impact of artefact removal on ChIP quality metrics in ChIP-seq and ChIP-exo data.” Frontiers in Genetics.
+Carroll TS, Liang Z, Salama R, Stark R and Santiago Id (in press). Impact of artefact removal on ChIP quality metrics in ChIP-seq and ChIP-exo data. Frontiers in Genetics.
 }
 \author{Thomas Carroll and Rory Stark}
 

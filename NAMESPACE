@@ -4,20 +4,20 @@ importClassesFrom(IRanges, IRanges)
 
 importClassesFrom(methods, character, list, numeric, oldClass)
 
-importMethodsFrom(BiocGenerics, as.data.frame, as.vector, cbind,
-                  colnames, duplicated, lapply, ncol, nrow, order,
-                  paste, rbind, rownames, sapply, strand, table,
-                  unique, unlist, xtabs)
+importMethodsFrom(BiocGenerics, as.data.frame, cbind,
+                                colnames, duplicated, lapply, ncol, nrow, order,
+                                paste, rbind, rownames, sapply, strand, table,
+                                unique, xtabs)
 
 importMethodsFrom(BiocParallel, bplapply)
 
 importMethodsFrom(GenomicAlignments, readGAlignments)
 
 importMethodsFrom(IRanges, as.list, as.matrix, "colnames<-",
-                  countOverlaps, coverage, end, flank, gsub, mean, median,
-                  merge, ranges, reduce, resize, "rownames<-",
-                  sd, shiftApply, start, t,
-                  viewMaxs, viewApply, Views, which, which.max, width)
+                           countOverlaps, coverage, end, flank, gsub, mean, median,
+                           merge, ranges, reduce, resize, "rownames<-",
+                           sd, start,
+                           viewMaxs, viewApply, Views, which, which.max, width)
 
 importMethodsFrom(methods, show)
 
@@ -27,6 +27,8 @@ import(chipseq)
 
 importFrom(Biobase, selectSome)
 
+importFrom(BiocGenerics, as.vector, unlist)
+
 import(DiffBind)
 
 import(GenomicRanges)
@@ -35,7 +37,7 @@ importFrom(ggplot2, aes, aes_string, element_blank, element_text,
            facet_grid, facet_wrap, geom_bar, geom_boxplot, geom_line,
            geom_path, geom_rect, geom_tile, ggplot, ggsave, labs,
            scale_fill_gradient2, scale_fill_manual, theme, xlab, xlim,
-           ylab)
+           ylab, coord_cartesian)
 
 importFrom(grDevices, dev.off, png)
 
@@ -46,10 +48,13 @@ importFrom(IRanges, "%over%", IRanges)
 importFrom(methods, as, new)
 
 importFrom(Nozzle.R1, addTo, asLink, asStrong, newCustomReport,
-           newFigure, newList, newParagraph, newSection, newSubSection,
-           newTable, writeReport)
+                      newFigure, newList, newParagraph, newSection, newSubSection,
+                      newTable, writeReport)
 
 importFrom(reshape2, melt)
+
+importFrom(GenomicFeatures, fiveUTRsByTranscript, threeUTRsByTranscript, cdsBy, intronsByTranscript,
+                            transcripts)
 
 importFrom(Rsamtools, bamFlagAsBitMatrix, BamFile, index, indexBam)
 
@@ -58,6 +63,8 @@ importFrom(stats, as.formula, formula, weighted.mean)
 importFrom(utils, browseURL, read.delim, read.table, sessionInfo)
 
 importFrom(Nozzle.R1, IMAGE.TYPE.RASTER, PROTECTION.PUBLIC)
+
+importFrom("grDevices", "boxplot.stats")
 
 export('ChIPQCsample','ChIPQC')
 exportMethods(
@@ -106,3 +113,12 @@ exportClasses(
     "ChIPQCsample", 
     "ChIPQCexperiment"
 )
+
+importFrom(TxDb.Hsapiens.UCSC.hg19.knownGene,TxDb.Hsapiens.UCSC.hg19.knownGene)
+importFrom(TxDb.Hsapiens.UCSC.hg18.knownGene,TxDb.Hsapiens.UCSC.hg18.knownGene)
+importFrom(TxDb.Mmusculus.UCSC.mm10.knownGene, TxDb.Mmusculus.UCSC.mm10.knownGene)
+importFrom(TxDb.Mmusculus.UCSC.mm9.knownGene,TxDb.Mmusculus.UCSC.mm9.knownGene)
+importFrom(TxDb.Rnorvegicus.UCSC.rn4.ensGene, TxDb.Rnorvegicus.UCSC.rn4.ensGene)
+importFrom(TxDb.Celegans.UCSC.ce6.ensGene,TxDb.Celegans.UCSC.ce6.ensGene)
+importFrom(TxDb.Dmelanogaster.UCSC.dm3.ensGene,TxDb.Dmelanogaster.UCSC.dm3.ensGene)
+

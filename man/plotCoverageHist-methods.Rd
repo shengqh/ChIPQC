@@ -21,7 +21,7 @@ Generate coverage histogram plots for a sample.
 }}
 
 \note{
-Uses \code{\link{ggplot2}} for plotting, and returns a \code{ggplot2} plot dataframe.
+Uses \code{ggplot2} for plotting, and returns a \code{ggplot2} plot dataframe.
 }
 
 \keyword{methods}

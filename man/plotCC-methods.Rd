@@ -24,7 +24,7 @@ Supported methods include:
 }}
 
 \note{
-plotCC uses \code{\link{ggplot2}} for plotting, and returns a \code{ggplot2} plot dataframe.
+plotCC uses \code{ggplot2} for plotting, and returns a \code{ggplot2} plot dataframe.
 }
 
 \keyword{methods}

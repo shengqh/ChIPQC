@@ -22,7 +22,7 @@ Generate fraction of reads in blacklist plots for a sample.
 }}
 
 \note{
-plotFribl uses \code{\link{ggplot2}} for plotting, and returns a \code{ggplot2} plot dataframe.
+plotFribl uses \code{ggplot2} for plotting, and returns a \code{ggplot2} plot dataframe.
 }
 
 \keyword{methods}
