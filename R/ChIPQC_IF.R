@@ -1,13 +1,13 @@
 ChIPQCsample = function(reads, peaks, annotation=NULL, chromosomes=NULL, 
                         mapQCth=15, blacklist, profileWin=400,fragmentLength=125,shifts=1:300,runCrossCor=FALSE,verboseT=TRUE) {
-  
-  if(missing(peaks)) peaks=NULL
-  if(missing(blacklist)) blacklist=NULL
-  res = sampleQC(bamFile=reads, bedFile=peaks, GeneAnnotation=annotation,blklist=blacklist,ChrOfInterest=chromosomes,
-                 Window=profileWin,FragmentLength=fragmentLength,
-                 shiftWindowStart=min(shifts),shiftWindowEnd=max(shifts),runCrossCor=runCrossCor,verboseT=verboseT)
-  
-  return(res)
+   
+   if(missing(peaks)) peaks=NULL
+   if(missing(blacklist)) blacklist=NULL
+   res = sampleQC(bamFile=reads, bedFile=peaks, GeneAnnotation=annotation,blklist=blacklist,ChrOfInterest=chromosomes,
+                  Window=profileWin,FragmentLength=fragmentLength,
+                  shiftWindowStart=min(shifts),shiftWindowEnd=max(shifts),runCrossCor=runCrossCor,verboseT=verboseT)
+   
+   return(res)
 }
 
 ChIPQC = function(experiment, annotation, chromosomes, samples, 
@@ -116,18 +116,30 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
    
    addconsensus = FALSE
    addcontrols  = FALSE
-   peaks=NA
+   setNull <- TRUE   
+   peaks <- NA
    if(consensus!=FALSE) {
       addcontrols  = TRUE
       addconsensus = TRUE
       if(consensus!=TRUE) {
          peaks = consensus
+         setNull <- FALSE   
+      } else {
+         setNull <- TRUE      
+         peaks = dba.peakset(experiment,bRetrieve=T,numCols=3,
+                             DataType=DBA_DATA_FRAME)
       }
    } else if(bCount) {
       addcontrols = TRUE
+      if(consensus==FALSE) {
+         setNull <- TRUE
+         peaks = dba.peakset(experiment,bRetrieve=T,
+                             DataType=DBA_DATA_FRAME)[,1:4]      
+      }
    } 
    
    if(addcontrols && controls) {
+      message("Adding controls...")
       startpos = length(samplelist) - controls
       for(i in 1:controls) {
          metadata   = getMeta(meta,names(samplelist)[[startpos+i]])
@@ -142,7 +154,8 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
       }
       meta = data.frame(t(experiment$class))
    }
-   if(is.na(peaks)) {
+   
+   if(is.na(peaks) || setNull==TRUE) {
       peaks = NULL
    }
    

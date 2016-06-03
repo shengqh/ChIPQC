@@ -19,7 +19,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
   #    require(GenomicAlignments)
   
   ChrLengths <- scanBamHeader(bamFile)[[1]]$targets
-  
+
   if(length(ChrLengths[ChrLengths < shiftWindowEnd - shiftWindowStart]) > 0){
     message("Removing ",length(ChrLengths[ChrLengths < shiftWindowEnd - shiftWindowStart]),
             " chromosomes with length less than cross-coverage shift")
@@ -119,7 +119,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       if(verboseT == T){
         
         message("Calculating coverage histogram for ",names(ChrLengths)[k],"\n")
-        
+      
       }
       
       CovHist <- c(CovHist,list(colSums(table_RleList(Cov))))
@@ -397,7 +397,7 @@ GetGRanges <- function(LoadFile,AllChr=NULL,ChrOfInterest=NULL,simple=FALSE,sepr
     }
   }else{
     if(class(LoadFile) == "character"){
-      RangesTable <- read.delim(LoadFile,sep=sepr,header=TRUE,comment="#")
+      RangesTable <- read.delim(LoadFile,sep=sepr,header=TRUE,comment.char="#")
     }else if(class(LoadFile) == "matrix"){
       RangesTable <- as.data.frame(LoadFile)
     } else{
@@ -472,28 +472,28 @@ getAnnotation = function(GeneAnnotation="hg19",AllChr){
   
   if(!is.null(GeneAnnotation)){
     if(GeneAnnotation == "hg19"){
-      require(TxDb.Hsapiens.UCSC.hg19.knownGene)
+      #require(TxDb.Hsapiens.UCSC.hg19.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
     } else if(GeneAnnotation == "hg20"){
-      require(TxDb.Hsapiens.UCSC.hg20.knownGene)
+      #require(TxDb.Hsapiens.UCSC.hg20.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg20.knownGene        
     }else if(GeneAnnotation == "hg18"){
-      require(TxDb.Hsapiens.UCSC.hg18.knownGene)
+      #require(TxDb.Hsapiens.UCSC.hg18.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene        
     }else if(GeneAnnotation == "mm10"){
-      require(TxDb.Mmusculus.UCSC.mm10.knownGene)
+      #require(TxDb.Mmusculus.UCSC.mm10.knownGene)
       txdb <- TxDb.Mmusculus.UCSC.mm10.knownGene        
     } else if(GeneAnnotation == "mm9"){
-      require(TxDb.Mmusculus.UCSC.mm9.knownGene)
+       #require(TxDb.Mmusculus.UCSC.mm9.knownGene)
       txdb <- TxDb.Mmusculus.UCSC.mm9.knownGene        
     } else if(GeneAnnotation == "rn4"){
-      require(TxDb.Rnorvegicus.UCSC.rn4.ensGene)
+       #require(TxDb.Rnorvegicus.UCSC.rn4.ensGene)
       txdb <- TxDb.Rnorvegicus.UCSC.rn4.ensGene        
     } else if(GeneAnnotation == "ce6"){
-      require(TxDb.Celegans.UCSC.ce6.ensGene)
+       #require(TxDb.Celegans.UCSC.ce6.ensGene)
       txdb <- TxDb.Celegans.UCSC.ce6.ensGene        
     } else if(GeneAnnotation == "dm3"){
-      require(TxDb.Dmelanogaster.UCSC.dm3.ensGene)
+       #require(TxDb.Dmelanogaster.UCSC.dm3.ensGene)
       txdb <- TxDb.Dmelanogaster.UCSC.dm3.ensGene        
     }else {
       stop('Unsupported annotation:',GeneAnnotation)

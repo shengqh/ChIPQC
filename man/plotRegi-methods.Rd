@@ -22,7 +22,7 @@ Generate relative enrichment of genomic features plots for a sample.
 }}
 
 \note{
-plotRegi uses \code{\link{ggplot2}} for plotting, and returns a \code{ggplot2} plot dataframe.
+plotRegi uses \code{ggplot2} for plotting, and returns a \code{ggplot2} plot dataframe.
 }
 
 \keyword{methods}
