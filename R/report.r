@@ -310,8 +310,8 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
 ){
   dir.create(reportFolder, showWarnings=FALSE)
   
-  ggsave(plotCC(object,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"CCPlot.png"))
-  ggsave(plotCoverageHist(object,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"CoverageHistogramPlot.png"))
+  ggsave(plotCC(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"CCPlot.png"))
+  ggsave(plotCoverageHist(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"CoverageHistogramPlot.png"))
   ccPlot <- newFigure(file.path("CCPlot.png"),"Plot of CrossCoverage score after successive strand shifts",
                       type = IMAGE.TYPE.RASTER, exportId = NULL,
                       protection = PROTECTION.PUBLIC)
@@ -320,7 +320,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
                            protection = PROTECTION.PUBLIC)
   
   if(sum(!apply(is.na(regi(object)),2,sum)>0)>0) {
-    ggsave(plotRegi(object,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=1*length(QCsample(object)),width=8)
+    ggsave(plotRegi(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=1*length(QCsample(object)),width=8)
     gfePlot <- newFigure(file.path("GenomicFeatureEnrichment.png"),"Heatmap of log2 enrichment of reads in genomic features",
                          type = IMAGE.TYPE.RASTER, exportId = NULL,
                          protection = PROTECTION.PUBLIC)
@@ -329,7 +329,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
   }
 
   if(sum(!is.na(ribl(object)))>0) {
-    ggsave(plotFribl(object,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Ribl.png"))
+    ggsave(plotFribl(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Ribl.png"))
     
     riblPlot <- newFigure(file.path("Ribl.png"),"Barplot of the percentage of reads in blacklists",
                           type = IMAGE.TYPE.RASTER, exportId = NULL,
@@ -340,9 +340,9 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
   }
   
   if(sum(unlist(lapply(peaks(object),length)))>0) {
-    ggsave(plotFrip(object,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Rip.png"))
-    ggsave(plotRap(object,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Rap.png"))
-    ggsave(plotPeakProfile(object,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"PeakProfile.png"))
+    ggsave(plotFrip(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Rip.png"))
+    ggsave(plotRap(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Rap.png"))
+    ggsave(plotPeakProfile(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"PeakProfile.png"))
   }
   png(file.path(reportFolder,"PeakCorHeatmap.png"),width=600,height=600)
   plotCorHeatmap(object,attributes=c(facetBy,colourBy))

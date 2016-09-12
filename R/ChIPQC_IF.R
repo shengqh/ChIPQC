@@ -133,7 +133,7 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
       addcontrols = TRUE
       if(consensus==FALSE) {
          setNull <- TRUE
-         peaks = dba.peakset(experiment,bRetrieve=T,
+         peaks = dba.peakset(experiment,bRetrieve=TRUE,
                              DataType=DBA_DATA_FRAME)[,1:4]      
       }
    } 

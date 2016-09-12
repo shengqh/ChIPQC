@@ -53,7 +53,7 @@ importFrom(Nozzle.R1, addTo, asLink, asStrong, newCustomReport,
 
 importFrom(reshape2, melt)
 
-importFrom(GenomicFeatures, fiveUTRsByTranscript, threeUTRsByTranscript, cdsBy, intronsByTranscript,
+importFrom(GenomicFeatures, fiveUTRsByTranscript, "seqlevels<-", threeUTRsByTranscript, cdsBy, intronsByTranscript,
                             transcripts)
 
 importFrom(Rsamtools, bamFlagAsBitMatrix, BamFile, index, indexBam)

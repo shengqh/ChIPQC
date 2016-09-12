@@ -141,6 +141,34 @@ setMethod("QCmetadata", "ChIPQCexperiment", function(object) {
    return(data.frame(meta))   
 })
 
+setMethod("QCmetadata", "list", function(object) {
+   tmmM <- lapply(object,metadata)
+   for(k in 1:length(object)){
+      sampleMetadata <- as.data.frame(tmmM[[k]])
+      
+      if(length(sampleMetadata) ==  0){
+         sampleMetadata <- data.frame(NoMetadata=TRUE)
+      }
+      if(k == 1){
+         dfM <- t(data.frame(Sample=names(object)[k],sampleMetadata))
+         colnames(dfM) <- names(object)[k]
+      }else if(k == 2){
+         dfMtemp <- t(data.frame(Sample=names(object)[k],sampleMetadata))
+         colnames(dfMtemp) <- names(object)[k]
+         dfM <- merge(dfM,dfMtemp,by=0)
+      }else{
+         dfMtemp <- t(data.frame(Sample=names(object)[k],sampleMetadata))
+         colnames(dfMtemp) <- names(object)[k]
+         dfM <- merge(dfM,dfMtemp,by.x=1,by.y=0)
+      }
+   }
+   dfM <- t(dfM)
+   colnames(dfM) <- dfM[1,]
+   dfM <- dfM[-1,]
+   dfM <- cbind(dfM[,"Sample",drop=FALSE],dfM[,colnames(dfM) != "Sample",drop=FALSE])
+   dfM <- dfM[,colnames(dfM) != "NoMetadata",drop=FALSE]
+   return(dfM)
+})
 
 setMethod("QCmetrics", "ChIPQCexperiment", function(object="ChIPQCexperiment"){
    res = t(sapply(object@Samples,QCmetrics))
@@ -148,8 +176,19 @@ setMethod("QCmetrics", "ChIPQCexperiment", function(object="ChIPQCexperiment"){
    return(res)
 })
 
+setMethod("QCmetrics", "list", function(object){
+   res = t(sapply(object,QCmetrics))
+   rownames(res) = names(object)
+   return(res)
+})
 setMethod("crosscoverage", "ChIPQCexperiment", function(object) {
    res = sapply(object@Samples,crosscoverage)
+   rownames(res) = 1:nrow(res)
+   return(res)
+}) 
+
+setMethod("crosscoverage", "list", function(object) {
+   res = sapply(object,crosscoverage)
    rownames(res) = 1:nrow(res)
    return(res)
 }) 
@@ -160,6 +199,12 @@ setMethod("ssd", "ChIPQCexperiment", function(object){
    return(res)
 })
 
+setMethod("ssd", "list", function(object){
+   res = sapply(object,ssd)
+   names(res)=names(object)
+   return(res)
+})
+
 
 setMethod("fragmentlength", "ChIPQCexperiment", function(object){
    res = sapply(object@Samples,fragmentlength)
@@ -167,14 +212,30 @@ setMethod("fragmentlength", "ChIPQCexperiment", function(object){
    return(res)   
 })
 
+setMethod("fragmentlength", "list", function(object){
+   res = sapply(object,fragmentlength)
+   names(res)=names(object)
+   return(res)   
+})
 setMethod("FragmentLengthCrossCoverage","ChIPQCexperiment", function(object){ 
    res = sapply(object@Samples,FragmentLengthCrossCoverage)
    names(res)=names(object@Samples)
    return(res)  
 })
+setMethod("FragmentLengthCrossCoverage","list", function(object){ 
+   res = sapply(object,FragmentLengthCrossCoverage)
+   names(res)=names(object)
+   return(res)  
+})
 setMethod("ReadLengthCrossCoverage", "ChIPQCexperiment", function(object){ 
    res = sapply(object@Samples,ReadLengthCrossCoverage)
    names(res)=names(object@Samples)
+   return(res)
+}
+)
+setMethod("ReadLengthCrossCoverage", "list", function(object){ 
+   res = sapply(object,ReadLengthCrossCoverage)
+   names(res)=names(object)
    return(res)
 }
 )
@@ -186,14 +247,35 @@ setMethod("RelativeCrossCoverage", "ChIPQCexperiment", function(object){
 }
 )
 
+setMethod("RelativeCrossCoverage", "list", function(object){ 
+   res = sapply(object,RelativeCrossCoverage)
+   #names(res)=names(object@Samples)
+   return(res)
+}
+)
+
+
 setMethod("flagtagcounts", "ChIPQCexperiment", function(object) {
    res = sapply(object@Samples,flagtagcounts)
    #names(res)=names(object@Samples)
    return(res)   
 })
 
+setMethod("flagtagcounts", "list", function(object) {
+   res = sapply(object,flagtagcounts)
+   #names(res)=names(object@Samples)
+   return(res)   
+})
+
+
 setMethod("regi", "ChIPQCexperiment", function(object){
    res = sapply(object@Samples,regi)
+   #names(res)=names(object@Samples)
+   return(signif(res,3))   
+})
+
+setMethod("regi", "list", function(object){
+   res = sapply(object,regi)
    #names(res)=names(object@Samples)
    return(signif(res,3))   
 })
@@ -203,6 +285,12 @@ setMethod("coveragehistogram", "ChIPQCexperiment", function(object) {
    res = list2matrix(res)
    return(res)   
 })
+setMethod("coveragehistogram", "list", function(object) {
+   res = sapply(object,coveragehistogram)
+   res = list2matrix(res)
+   return(res)   
+})
+
 
 setMethod("averagepeaksignal", "ChIPQCexperiment", function(object) {
    res = sapply(object@Samples,averagepeaksignal)
@@ -213,24 +301,37 @@ setMethod("averagepeaksignal", "ChIPQCexperiment", function(object) {
    return(res)   
 })
 
-setMethod("regi", "ChIPQCexperiment", function(object) {
-   res = sapply(object@Samples,regi)
-   #res = list2matrix(res)
+setMethod("averagepeaksignal", "list", function(object) {
+   res = sapply(object,averagepeaksignal)
+   
+   #return(res)
+   
+   res = list2matrix(res)
    return(res)   
 })
+
 
 setMethod("Normalisedaveragepeaksignal", "ChIPQCexperiment", function(object) {
    res = sapply(object@Samples,Normalisedaveragepeaksignal)
    res = list2matrix(res)
    return(res)   
 })
-
+setMethod("Normalisedaveragepeaksignal", "list", function(object) {
+   res = sapply(object,Normalisedaveragepeaksignal)
+   res = list2matrix(res)
+   return(res)   
+})
 setMethod("peaks", "ChIPQCexperiment", function(object){
    res = sapply(object@Samples,peaks)
    res = GRangesList(res)
    return(res)
 })
 
+setMethod("peaks", "list", function(object){
+   res = sapply(object,peaks)
+   res = GRangesList(res)
+   return(res)
+})
 
 setMethod("readlength", "ChIPQCexperiment", function(object){
    res = sapply(object@Samples,readlength)
@@ -239,9 +340,21 @@ setMethod("readlength", "ChIPQCexperiment", function(object){
 })
 
 
+setMethod("readlength", "list", function(object){
+   res = sapply(object,readlength)
+   names(res)=names(object)
+   return(res)
+})
+
 setMethod("frip", "ChIPQCexperiment", function(object){
    res = sapply(object@Samples,frip)
    names(res)=names(object@Samples)
+   return(res)
+})
+
+setMethod("frip", "list", function(object){
+   res = sapply(object,frip)
+   names(res)=names(object)
    return(res)
 })
 
@@ -250,15 +363,29 @@ setMethod("rip", "ChIPQCexperiment", function(object){
    names(res)=names(object@Samples)
    return(res)
 })
+setMethod("rip", "list", function(object){
+   res = sapply(object,rip)
+   names(res)=names(object)
+   return(res)
+})
 setMethod("ribl", "ChIPQCexperiment", function(object){
    res = sapply(object@Samples,ribl)
    names(res)=names(object@Samples)
    return(res)
 })
-
+setMethod("ribl", "list", function(object){
+   res = sapply(object,ribl)
+   names(res)=names(object)
+   return(res)
+})
 setMethod("mapped", "ChIPQCexperiment", function(object){
    res = sapply(object@Samples,mapped)
    names(res)=names(object@Samples)
+   return(res)
+})
+setMethod("mapped", "list", function(object){
+   res = sapply(object,mapped)
+   names(res)=names(object)
    return(res)
 })
 
@@ -268,11 +395,22 @@ setMethod("reads", "ChIPQCexperiment", function(object,bFiltered){
    names(res)=names(object@Samples)   
    return(res)
 })
-
+setMethod("reads", "list", function(object,bFiltered){
+   if(missing(bFiltered)) bFiltered=TRUE
+   res = sapply(object,reads,bFiltered)
+   names(res)=names(object)   
+   return(res)
+})
 setMethod("duplicates", "ChIPQCexperiment", function(object,bFiltered){
    if(missing(bFiltered)) bFiltered=TRUE
    res = sapply(object@Samples,duplicates,bFiltered)
    names(res)=names(object@Samples)
+   return(res)
+})
+setMethod("duplicates", "list", function(object,bFiltered){
+   if(missing(bFiltered)) bFiltered=TRUE
+   res = sapply(object,duplicates,bFiltered)
+   names(res)=names(object)
    return(res)
 })
 
@@ -283,4 +421,10 @@ setMethod("duplicateRate", "ChIPQCexperiment", function(object, bFiltered){
    return(res)
 })
 
+setMethod("duplicateRate", "list", function(object, bFiltered){
+   if(missing(bFiltered)) bFiltered=TRUE
+   res = sapply(object,duplicateRate,bFiltered)
+   names(res)=names(object)
+   return(res)
+})
 

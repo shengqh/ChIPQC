@@ -74,15 +74,58 @@ setMethod("plotCC", "ChIPQCexperiment", function(object,method="Coverage",facet=
   
   colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
   
-  Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)      
+  Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)
+  if(facet){
   Plot <- Plot + aes(group=Sample) +
     metadataOpts$facetBy +
     metadataOpts$colour +
     metadataOpts$lineType
+  }else{
+     Plot <- Plot + aes(group=Sample) +
+     metadataOpts$colour +
+     metadataOpts$lineType     
+  }
   
   return(Plot)
 })
 
+setMethod("plotCC", "list", function(object,method="Coverage",facet=TRUE,
+                                                 facetBy=c("Tissue","Factor"),                                                 
+                                                 colourBy="Replicate",
+                                                 lineBy=NULL,
+                                                 addMetaData=NULL
+){
+   
+   ccvector <- crosscoverage(object)
+   readlen <- max(readlength(object))
+   shiftlength <- nrow(ccvector)
+   
+   toMelt <- data.frame("Shift_Size"=seq(1,shiftlength),
+                        #"metadataOfInterest"=metadataOfInterest,
+                        ccvector)
+   CCDataFrame <- melt(toMelt,id.vars=c("Shift_Size"))
+   
+   
+   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy,lineBy)        
+   
+   
+   CCDataFrameWithMetaData <- merge(CCDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)
+   
+   colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
+   
+   Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)
+   if(facet){
+   Plot <- Plot + aes(group=Sample) +
+      metadataOpts$facetBy +
+      metadataOpts$colour +
+      metadataOpts$lineType
+   }else{
+      Plot <- Plot + aes(group=Sample) +
+         metadataOpts$colour +
+         metadataOpts$lineType      
+   }
+   return(Plot)
+})
 setMethod("plotCC", "ChIPQCsample", function(object,method="Coverage"){
   if(method=="Coverage"){
     ccvector <- crosscoverage(object)
@@ -137,16 +180,61 @@ setMethod("plotPeakProfile", "ChIPQCexperiment", function(object,facet=TRUE,
     
     
     Plot <- makePeakProfilePlot(PSDataFrameWithMetaData,Window=length(Width))
+    if(facet){
     Plot <- Plot + aes(group=Sample) +
       metadataOpts$facetBy +
       metadataOpts$colour +
       metadataOpts$lineType
+    }else{
+       Plot <- Plot + aes(group=Sample) +
+       metadataOpts$colour +
+       metadataOpts$lineType       
+    }
     return(Plot)
   }else{
     stop("No average signal available for sample")
   }
 })
 
+
+setMethod("plotPeakProfile", "list", function(object,facet=TRUE,
+                                                          facetBy=c("Sample"),
+                                                          colourBy="Sample",
+                                                          lineBy=NULL,
+                                                          addMetaData=NULL                                                         
+)
+{
+   PeakSignal <- averagepeaksignal(object)
+   if(all(!is.na(PeakSignal))){
+      Width <- seq(-nrow(PeakSignal)/2,nrow(PeakSignal)/2)[-(nrow(PeakSignal)/2+1)]
+      PSDataFrame <- data.frame(Width,PeakSignal)
+      
+      PSDataFrame <- melt(PSDataFrame,id.vars=c("Width"))
+      
+      metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy,lineBy)        
+      
+      PSDataFrameWithMetaData <- merge(PSDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)      
+      colnames(PSDataFrameWithMetaData)[1:3] <- c("Sample","Distance","Signal")
+      
+      
+      
+      Plot <- makePeakProfilePlot(PSDataFrameWithMetaData,Window=length(Width))
+      
+      if(facet){
+         Plot <- Plot + aes(group=Sample) +
+         metadataOpts$facetBy +
+         metadataOpts$colour +
+         metadataOpts$lineType
+      }else{
+         Plot <- Plot + aes(group=Sample) +
+         metadataOpts$colour +
+         metadataOpts$lineType
+         }
+      return(Plot)
+   }else{
+      stop("No average signal available for sample")
+   }
+})
 
 
 setMethod("plotPeakProfile", "ChIPQCsample", function(object){
@@ -213,13 +301,60 @@ setMethod("plotCoverageHist", "ChIPQCexperiment", function(object,maxDepthToPlot
   
   
   Plot <- makeCoveragePlot(covHistFrameWithMetaData,maxDepthToPlot)
+  if(facet){
   Plot <- Plot + 
     metadataOpts$facetBy +
     metadataOpts$colour +
     metadataOpts$lineType
-  
+  }else{
+     Plot <- Plot +
+        metadataOpts$colour +
+        metadataOpts$lineType     
+  }
   
   return(Plot)
+}
+)
+
+setMethod("plotCoverageHist", "list", function(object,maxDepthToPlot=100,facet=TRUE,
+                                                           facetBy=c("Sample"),
+                                                           colourBy="Sample",
+                                                           lineBy=NULL,
+                                                           addMetaData=NULL                                                         
+)
+{
+   
+   
+   covHist <- melt(coveragehistogram(object))
+   
+   covHistFrame <- data.frame(
+      Sample=covHist$Var2,
+      Depth = as.numeric(as.vector(covHist$Var1)),
+      log10_bp=log10(as.numeric(as.vector(covHist$value)))
+   )   
+   
+   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy,lineBy)        
+   
+   covHistFrameWithMetaData <- merge(covHistFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE)      
+   
+   colnames(covHistFrameWithMetaData)[1:3] <- c("Sample","Depth","log10_bp")
+   
+   
+   
+   Plot <- makeCoveragePlot(covHistFrameWithMetaData,maxDepthToPlot)
+   if(facet){
+   Plot <- Plot + 
+      metadataOpts$facetBy +
+      metadataOpts$colour +
+      metadataOpts$lineType
+   }else{
+      Plot <- Plot + 
+         metadataOpts$colour +
+         metadataOpts$lineType
+      
+   }
+   
+   return(Plot)
 }
 )
 
@@ -280,11 +415,48 @@ setMethod("plotFrip", "ChIPQCexperiment", function(object,type="barstacked",face
   colnames(fripDataFrameWithMetaData)[1:3] <- c("Sample","Reads","FRIP")
   fripDataFrameWithMetaData <- fripDataFrameWithMetaData[order(fripDataFrameWithMetaData[,"Sample"],fripDataFrameWithMetaData[,"Reads"]),]
   Plot <- makeFripPlot(fripDataFrameWithMetaData)
+  if(facet){
   metadataOpts$facetBy$free$x <- TRUE
   Plot <- Plot + 
     metadataOpts$facetBy 
+  }
   
   return(Plot)
+})
+
+
+setMethod("plotFrip", "list", function(object,type="barstacked",facet=TRUE,
+                                                   facetBy=c("Sample"),
+                                                   addMetaData=NULL,AsPercent=TRUE){
+   rip <- rip(object)
+   mapped <- mapped(object)  
+   ripWithPeaks <- rip[!is.na(rip)]
+   mappedWithPeaks <- mapped[!is.na(rip)]
+   toMelt <- data.frame(Sample=names(ripWithPeaks),Inside=ripWithPeaks,OutSide=mappedWithPeaks-ripWithPeaks)
+   PercentInside <- toMelt[,"Inside"]/rowSums(toMelt[,c("Inside","OutSide")])
+   PercentOutside <- toMelt[,"OutSide"]/rowSums(toMelt[,c("Inside","OutSide")])
+   if(AsPercent){
+      toMelt[,"Inside"] <- PercentInside*100
+      toMelt[,"OutSide"] <- PercentOutside*100
+   }
+   
+   
+   fripDataFrame <- melt(toMelt)
+   
+   
+   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)        
+   
+   
+   fripDataFrameWithMetaData <- merge(fripDataFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE)      
+   colnames(fripDataFrameWithMetaData)[1:3] <- c("Sample","Reads","FRIP")
+   fripDataFrameWithMetaData <- fripDataFrameWithMetaData[order(fripDataFrameWithMetaData[,"Sample"],fripDataFrameWithMetaData[,"Reads"]),]
+   Plot <- makeFripPlot(fripDataFrameWithMetaData)
+   if(facet){
+   metadataOpts$facetBy$free$x <- TRUE
+   Plot <- Plot + 
+      metadataOpts$facetBy 
+   }
+   return(Plot)
 })
 
 setMethod("plotFrip", "ChIPQCsample", function(object,type="barstacked",facet=TRUE,
@@ -348,14 +520,54 @@ setMethod("plotFribl", "ChIPQCexperiment", function(object,type="barstacked",fac
   colnames(friblDataFrameWithMetaData)[1:3] <- c("Sample","Reads","FRIBL")
   friblDataFrameWithMetaData <- friblDataFrameWithMetaData[order(friblDataFrameWithMetaData[,"Sample"],friblDataFrameWithMetaData[,"Reads"]),]
   Plot <- makeFriblPlot(friblDataFrameWithMetaData)
+  if(facet){
   metadataOpts$facetBy$free$x <- TRUE
   Plot <- Plot + 
     metadataOpts$facetBy 
+  }
   #   if(AsPercent){
   #      Plot+scale_y_continuous(labels = "percent")
   #   }
   return(Plot)
   
+})
+
+
+setMethod("plotFribl", "list", function(object,type="barstacked",facet=TRUE,
+                                                    facetBy=c("Sample"),
+                                                    addMetaData=NULL,AsPercent=TRUE){
+   AsPercent <- TRUE
+   ribl <- ribl(object)
+   mapped <- mapped(object)  
+   riblWithBLs <- ribl[!is.na(ribl)]
+   mappedWithBLs <- mapped[!is.na(ribl)]
+   toMelt <- data.frame(Sample=names(riblWithBLs),Inside=riblWithBLs,OutSide=mappedWithBLs-riblWithBLs)
+   PercentInside <- toMelt[,"Inside"]/rowSums(toMelt[,c("Inside","OutSide")])
+   PercentOutside <- toMelt[,"OutSide"]/rowSums(toMelt[,c("Inside","OutSide")])
+   if(AsPercent){
+      toMelt[,"Inside"] <- PercentInside*100
+      toMelt[,"OutSide"] <- PercentOutside*100
+   }
+   friblDataFrame <- melt(toMelt)
+   
+   
+   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)        
+   
+   
+   friblDataFrameWithMetaData <- merge(friblDataFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE)      
+   colnames(friblDataFrameWithMetaData)[1:3] <- c("Sample","Reads","FRIBL")
+   friblDataFrameWithMetaData <- friblDataFrameWithMetaData[order(friblDataFrameWithMetaData[,"Sample"],friblDataFrameWithMetaData[,"Reads"]),]
+   Plot <- makeFriblPlot(friblDataFrameWithMetaData)
+   if(facet){
+   metadataOpts$facetBy$free$x <- TRUE
+   Plot <- Plot + 
+      metadataOpts$facetBy 
+   }
+   #   if(AsPercent){
+   #      Plot+scale_y_continuous(labels = "percent")
+   #   }
+   return(Plot)
+   
 })
 
 setMethod("plotFribl", "ChIPQCsample", function(object,type="barstacked",AsPercent=TRUE){
@@ -430,13 +642,47 @@ setMethod("plotRap", "ChIPQCexperiment", function(object,facet=TRUE,
   Plot <- makeRapPlot(rapDataFrameWithMetaData)
   
   metadataOpts$facetBy[2]$free$x <- TRUE
-  
-  Plot <- Plot + metadataOpts$facetBy 
+  if(facet){
+   Plot <- Plot + metadataOpts$facetBy 
+  }
   Plot <- Plot + coord_cartesian(ylim = ylimNew*1.05)
   return(Plot)
   
 })
 
+
+setMethod("plotRap", "list", function(object,facet=TRUE,
+                                                  facetBy=c("Sample"),
+                                                  addMetaData=NULL){
+   
+   Peaks <- peaks(object)
+   haspeaks = lapply(Peaks,length)>0
+   Peaks = Peaks[haspeaks]
+   peakCountList <- sapply(Peaks,function(x)elementMetadata(x)$Counts)
+   peakCountMatrix <- list2matrix(peakCountList)
+   ylimNew <- c(0,max(unlist(lapply(apply(peakCountMatrix,2,function(x) boxplot.stats(x[x!=0])),
+                                    function(x) x$stats[5]))))
+   
+   rapDataFrame <- melt(peakCountMatrix)
+   metadata <- QCmetadata(object)[haspeaks,]         
+   
+   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)        
+   
+   
+   rapDataFrameWithMetaData <- merge(rapDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)      
+   colnames(rapDataFrameWithMetaData)[1:3] <- c("Sample","PeakNumber","CountsInPeaks")
+   
+   
+   Plot <- makeRapPlot(rapDataFrameWithMetaData)
+   
+   metadataOpts$facetBy[2]$free$x <- TRUE
+   if(facet){
+      Plot <- Plot + metadataOpts$facetBy 
+   }
+   Plot <- Plot + coord_cartesian(ylim = ylimNew*1.05)
+   return(Plot)
+   
+})
 
 #########################################
 #########################################
@@ -482,8 +728,9 @@ setMethod("plotRegi", "ChIPQCexperiment", function(object,facet=TRUE,
   #                                                                                                               "500_Upstream","5UTRs","Transcripts","Introns","3UTRs"))
   
   Plot <- makeRegiPlot(regiScoresFrameWithMetadata)
-  
+  if(facet){
   Plot <- Plot+facet_grid(facetGridForm,scales="free_y")#,ncol=1)
+  }
   Plot <- Plot + theme(text = element_text(size=20),
                        axis.text.x = element_text(angle=90, vjust=1))+xlab("")+ylab("")
   
@@ -492,6 +739,52 @@ setMethod("plotRegi", "ChIPQCexperiment", function(object,facet=TRUE,
 )
 
 
+
+   
+   setMethod("plotRegi", "list", function(object,facet=TRUE,
+                                                      facetBy=c("Sample"),
+                                                      addMetaData=NULL){
+      if(all(sapply(object,function(x)class(x) == "ChIPQCsample")) & all(sapply(names(object),function(x)!is.null(x)))){
+      regiScores <- regi(object)
+      hasna = apply(is.na(regiScores),2,sum)>0
+      if(sum(hasna)==length(hasna)) {
+         warning('No genomic annotation computed')
+         invisible(NULL)
+      } else {
+         regiScores = regiScores[,!hasna]
+      }
+      #rownames(regiScores)[5:7] <- c("500_Upstream","2000To500_Upstream","20000To2000_Upstream")   
+      meltedDF <- melt(regiScores)
+      
+      #metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)        
+      regiScoresFrame <- data.frame(Sample=meltedDF$Var2,
+                                    GenomicIntervals=meltedDF$Var1,
+                                    log2_Enrichment=meltedDF$value)
+      metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)
+      metadataOpts$metadata = metadataOpts$metadata[!hasna,]
+      
+      facetGridForm <- as.formula(paste0(paste(names(metadataOpts$facetBy$facets),collapse="+"),"~."))
+      
+      regiScoresFrameWithMetadata <- merge(regiScoresFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE,sort=FALSE)      
+      
+      #regiScoresFrameWithMetadata[,"GenomicIntervals"] <- ordered(regiScoresFrameWithMetadata[,"GenomicIntervals"],c("20000To2000_Upstream","2000To500_Upstream",
+      #                                                                                                               "500_Upstream","5UTRs","Transcripts","Introns","3UTRs"))
+      
+      Plot <- makeRegiPlot(regiScoresFrameWithMetadata)
+      if(facet){
+      Plot <- Plot+facet_grid(facetGridForm,scales="free_y")#,ncol=1)
+      }
+      Plot <- Plot + theme(text = element_text(size=20),
+                           axis.text.x = element_text(angle=90, vjust=1))+xlab("")+ylab("")
+      
+      return(Plot)
+      }else{
+         NULL
+      }
+   }
+   )
+   
+   
 setMethod("plotRegi", "ChIPQCsample", function(object){
   ### PlaceHolder!
   regiScores <- regi(object)
@@ -554,9 +847,38 @@ setMethod("plotSSD", "ChIPQCexperiment", function(object,facet=TRUE,
   
   colnames(SSDDataFrameWithMetaData)[1:3] <- c("Sample","Filter","SSD")
   
-  Plot <- makeSSDPlot(SSDDataFrameWithMetaData)      
-  Plot <- Plot +facet_grid(facetGridForm,scales="free_y")
+  Plot <- makeSSDPlot(SSDDataFrameWithMetaData)
+  if(facet){
+   Plot <- Plot +facet_grid(facetGridForm,scales="free_y")
+  }
   return(Plot)
+})
+
+
+setMethod("plotSSD", "list", function(object,facet=TRUE,
+                                                  facetBy=c("Sample"),addMetaData=NULL){
+   ssd <- unlist(lapply(object,function(x) x@SSD))
+   ssdBL <- unlist(lapply(object,function(x) x@SSDBL))
+   #ssdBL[is.na(ssdBL)] <- ssd[is.na(ssdBL)] 
+   SSDDataFrame <- data.frame(
+      Sample=names(ssdBL),
+      Pre_Blacklist=ssd,
+      Post_Blacklist=ssdBL)
+   meltedSSDDataFrame <- melt(SSDDataFrame)
+   metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)
+   
+   SSDDataFrameWithMetaData <- merge(meltedSSDDataFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE)
+   
+   facetGridForm <- as.formula(paste0(paste(names(metadataOpts$facetBy$facets),collapse="+"),"~."))
+   
+   colnames(SSDDataFrameWithMetaData)[1:3] <- c("Sample","Filter","SSD")
+   
+   Plot <- makeSSDPlot(SSDDataFrameWithMetaData)
+   if(facet){
+      Plot <- Plot +facet_grid(facetGridForm,scales="free_y")
+   }
+   return(Plot)
+   
 })
 
 

@@ -4,6 +4,7 @@
 \alias{plotCC}
 \alias{plotCC,ChIPQCexperiment-method}
 \alias{plotCC,ChIPQCsample-method}
+\alias{plotCC,list-method}
 \title{Generate Cross-Coverage plots}
 \description{
 Generate Cross-Coverage plots.
@@ -13,6 +14,10 @@ Generate Cross-Coverage plots.
 
 \item{\code{signature(object = "ChIPQCexperiment", method)}}{
 Generate cross-coverage plots for all the samples in an experiment. 
+}
+
+\item{\code{signature(object = "list", method)}}{
+Generate cross-coverage plots for list of samples in an experiment. 
 }
 
 \item{\code{signature(object = "ChIPQCsample", methods)}}{
@@ -37,5 +42,6 @@ plotCC uses \code{ggplot2} for plotting, and returns a \code{ggplot2} plot dataf
 data(example_QCexperiment)
 plotCC(exampleExp)
 plotCC(QCsample(exampleExp,1))
+plotCC(QCsample(exampleExp)[1:4])
 }
 
