@@ -13,12 +13,12 @@ mergeMetadata <- function(object,addMetaData,facetBy,colourBy,lineBy){
   }else{
     facet <- NULL  
   }
-  if(all(colourBy %in% colnames(metadata))){
+  if(all(colourBy %in% c(colnames(metadata),"Sample"))){
     colour <- aes_string(colour=colourBy)
   }else{
     colour <- NULL  
   }
-  if(all(lineBy %in% colnames(metadata))){
+  if(all(lineBy %in% c(colnames(metadata),"Sample"))){
     lineType <- aes_string(linetype=lineBy)
   }else{
     lineType <- NULL  
