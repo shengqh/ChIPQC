@@ -123,9 +123,9 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       FlagTagCounts <- rbind(cbind(UnMapped,Mapped,Duplicates,MapQPass,MapQPassAndDup),FlagTagCounts)
       
       
-      MapQPass <- sum(temp[temp[,"A"] != 1 & as.numeric(as.vector(temp[,"C"])) >= 15,"Freq"])
-      MapQPassAndDup <- sum(temp[temp[,"A"] != 1 & temp[,"B"] == 1 & as.numeric(as.vector(temp[,"C"])) >= mapQCutoff,"Freq"])
-      FlagTagCounts <- rbind(cbind(UnMapped,Mapped,Duplicates,MapQPass,MapQPassAndDup),FlagTagCounts)
+      # MapQPass <- sum(temp[temp[,"A"] != 1 & as.numeric(as.vector(temp[,"C"])) >= 15,"Freq"])
+      # MapQPassAndDup <- sum(temp[temp[,"A"] != 1 & temp[,"B"] == 1 & as.numeric(as.vector(temp[,"C"])) >= mapQCutoff,"Freq"])
+      # FlagTagCounts <- rbind(cbind(UnMapped,Mapped,Duplicates,MapQPass,MapQPassAndDup),FlagTagCounts)
       
       
       Cov <- coverage(Sample_GIT,width=unname(ChrLengths[k]))
