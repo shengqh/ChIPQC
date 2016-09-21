@@ -115,6 +115,7 @@ exportClasses(
     "ChIPQCexperiment"
 )
 
+importFrom(TxDb.Hsapiens.UCSC.hg38.knownGene,TxDb.Hsapiens.UCSC.hg38.knownGene)
 importFrom(TxDb.Hsapiens.UCSC.hg19.knownGene,TxDb.Hsapiens.UCSC.hg19.knownGene)
 importFrom(TxDb.Hsapiens.UCSC.hg18.knownGene,TxDb.Hsapiens.UCSC.hg18.knownGene)
 importFrom(TxDb.Mmusculus.UCSC.mm10.knownGene, TxDb.Mmusculus.UCSC.mm10.knownGene)

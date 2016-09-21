@@ -504,9 +504,9 @@ getAnnotation = function(GeneAnnotation="hg19",AllChr){
     if(GeneAnnotation == "hg19"){
       #require(TxDb.Hsapiens.UCSC.hg19.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-    } else if(GeneAnnotation == "hg20"){
+    } else if(GeneAnnotation == "hg38"){
       #require(TxDb.Hsapiens.UCSC.hg20.knownGene)
-      txdb <- TxDb.Hsapiens.UCSC.hg20.knownGene        
+      txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene        
     }else if(GeneAnnotation == "hg18"){
       #require(TxDb.Hsapiens.UCSC.hg18.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene        
