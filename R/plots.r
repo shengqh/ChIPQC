@@ -32,10 +32,16 @@ mergeMetadata <- function(object,addMetaData,facetBy,colourBy,lineBy){
 ############################
 ## CrossCoverage Plotting
 
-makeCCplot <- function(CCDataFrame,shiftlength,readlen){
-  P <- ggplot(CCDataFrame,aes(x=Shift_Size,y=CC_Score))+geom_path(alpha = 1,size=1.3)+xlim(0,shiftlength)+ylab("CC_Score")+
-    geom_rect(data=CCDataFrame,xmin=-Inf,colour="grey80",xmax=readlen*2,ymin=-Inf,ymax=Inf,fill="grey20",alpha = 0.002)+
-    theme(axis.title.y=element_text(angle=0))
+makeCCplot <- function(CCDataFrame,shiftlength,readlen,excludedBox=F){
+   CCDataFrame <- CCDataFrame[order(CCDataFrame$Shift_Size),]
+   if(excludedBox){
+     P <- ggplot(CCDataFrame,aes(x=Shift_Size,y=CC_Score))+geom_path(alpha = 1,size=1.3)+xlim(0,shiftlength)+ylab("CC_Score")+
+       geom_rect(data=CCDataFrame,xmin=-Inf,colour="grey80",xmax=readlen*2,ymin=-Inf,ymax=Inf,fill="grey20",alpha = 0.002)+
+       theme(axis.title.y=element_text(angle=0))
+   }else{
+      P <- ggplot(CCDataFrame,aes(x=Shift_Size,y=CC_Score))+geom_path(alpha = 1,size=1.3)+xlim(0,shiftlength)+ylab("CC_Score")+
+         theme(axis.title.y=element_text(angle=0))     
+   }
   return(P)
 }
 
@@ -45,7 +51,7 @@ setGeneric("plotCC", function(object="ChIPQCexperiment",method="Coverage",facet=
                               facetBy=c("Tissue","Factor"),
                               colourBy="Replicate",
                               lineBy=NULL,
-                              addMetaData=NULL
+                              addMetaData=NULL,excludedBox=F
 )
   standardGeneric("plotCC")
 )
@@ -54,7 +60,7 @@ setMethod("plotCC", "ChIPQCexperiment", function(object,method="Coverage",facet=
                                                  facetBy=c("Tissue","Factor"),                                                 
                                                  colourBy="Replicate",
                                                  lineBy=NULL,
-                                                 addMetaData=NULL
+                                                 addMetaData=NULL,excludedBox=FALSE
 ){
   
   ccvector <- crosscoverage(object)
@@ -73,8 +79,7 @@ setMethod("plotCC", "ChIPQCexperiment", function(object,method="Coverage",facet=
   CCDataFrameWithMetaData <- merge(CCDataFrame,metadataOpts$metadata,by.x=2,by.y=1,all=FALSE)
   
   colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
-  
-  Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)
+  Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen,excludedBox)
   if(facet){
   Plot <- Plot + aes(group=Sample) +
     metadataOpts$facetBy +
@@ -93,7 +98,7 @@ setMethod("plotCC", "list", function(object,method="Coverage",facet=TRUE,
                                                  facetBy=c("Tissue","Factor"),                                                 
                                                  colourBy="Replicate",
                                                  lineBy=NULL,
-                                                 addMetaData=NULL
+                                                 addMetaData=NULL,excludedBox=FALSE
 ){
    
    ccvector <- crosscoverage(object)
@@ -113,7 +118,7 @@ setMethod("plotCC", "list", function(object,method="Coverage",facet=TRUE,
    
    colnames(CCDataFrameWithMetaData)[1:3] <- c("Sample","Shift_Size","CC_Score")
    
-   Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen)
+   Plot <- makeCCplot(CCDataFrameWithMetaData,shiftlength,readlen,excludedBox)
    if(facet){
    Plot <- Plot + aes(group=Sample) +
       metadataOpts$facetBy +
@@ -126,14 +131,14 @@ setMethod("plotCC", "list", function(object,method="Coverage",facet=TRUE,
    }
    return(Plot)
 })
-setMethod("plotCC", "ChIPQCsample", function(object,method="Coverage"){
+setMethod("plotCC", "ChIPQCsample", function(object,method="Coverage",excludedBox=FALSE){
   if(method=="Coverage"){
     ccvector <- crosscoverage(object)
     readlen <- readlength(object)
     shiftlength <- length(ccvector)
     CCDataFrame <- data.frame(cbind(seq(1,shiftlength),as.numeric(ccvector)))
     colnames(CCDataFrame) <- c("Shift_Size","CC_Score")
-    Plot <- makeCCplot(CCDataFrame,shiftlength,readlen)
+    Plot <- makeCCplot(CCDataFrame,shiftlength,readlen,excludedBox)
     return(Plot)
   }
 })
@@ -257,6 +262,7 @@ setMethod("plotPeakProfile", "ChIPQCsample", function(object){
 
 makeCoveragePlot <- function(covHistFrame,maxDepthToPlot)
 {
+   covHistFrame <- covHistFrame[order(covHistFrame$Depth),]
   P <- ggplot(covHistFrame,aes(x=Depth,y=log10_bp,group=Sample))
   P <- P+geom_path(na.rm=TRUE,size=1.2)
   P <- P+xlim(0,maxDepthToPlot)

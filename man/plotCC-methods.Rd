@@ -41,6 +41,7 @@ plotCC uses \code{ggplot2} for plotting, and returns a \code{ggplot2} plot dataf
 \examples{
 data(example_QCexperiment)
 plotCC(exampleExp)
+plotCC(exampleExp,excludedBox=TRUE)
 plotCC(QCsample(exampleExp,1))
 plotCC(QCsample(exampleExp)[1:4])
 }
