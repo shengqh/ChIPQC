@@ -4,6 +4,7 @@
 \alias{plotRegi}
 \alias{plotRegi,ChIPQCexperiment-method}
 \alias{plotRegi,ChIPQCsample-method}
+\alias{plotRegi,list-method}
 \title{Generate relative enrichment of genomic features plot}
 \description{
 Generate relative enrichment of genomic features plot.
@@ -14,6 +15,11 @@ Generate relative enrichment of genomic features plot.
 \item{\code{signature(object = "ChIPQCexperiment", facet=T,
                                 facetBy=c("Tissue","Factor"))}}{
 Generate relative enrichment of genomic features plots for all the samples in an experiment.
+}
+
+\item{\code{signature(object = "list",facet=T,
+                                facetBy=c("Sample"))}}{
+Generate relative enrichment of genomic features plots for all the samples in a list of ChIPQCsample objects.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

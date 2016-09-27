@@ -407,6 +407,113 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
 })
 
 
+setMethod("ChIPQCreport", "list", function(object,facet=TRUE,
+                                                       reportName="ChIPQC",reportFolder="ChIPQCreport",
+                                                       facetBy=c("Tissue","Factor","Condition","Treatment"),
+                                                       colourBy=c("Replicate"),
+                                                       lineBy=NULL,
+                                                       addMetaData=NULL
+                                                       
+){
+   dir.create(reportFolder, showWarnings=FALSE)
+   
+   ggsave(plotCC(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"CCPlot.png"))
+   ggsave(plotCoverageHist(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"CoverageHistogramPlot.png"))
+   ccPlot <- newFigure(file.path("CCPlot.png"),"Plot of CrossCoverage score after successive strand shifts",
+                       type = IMAGE.TYPE.RASTER, exportId = NULL,
+                       protection = PROTECTION.PUBLIC)
+   covhistPlot <- newFigure(file.path("CoverageHistogramPlot.png"),"Plot of the log2 base pairs of genome at differing read depths",
+                            type = IMAGE.TYPE.RASTER, exportId = NULL,
+                            protection = PROTECTION.PUBLIC)
+   
+   if(sum(!apply(is.na(regi(object)),2,sum)>0)>0) {
+      ggsave(plotRegi(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=1*length(object),width=8)
+      gfePlot <- newFigure(file.path("GenomicFeatureEnrichment.png"),"Heatmap of log2 enrichment of reads in genomic features",
+                           type = IMAGE.TYPE.RASTER, exportId = NULL,
+                           protection = PROTECTION.PUBLIC)
+   } else {
+      gfePlot <- NULL
+   }
+   
+   if(sum(!is.na(ribl(object)))>0) {
+      ggsave(plotFribl(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Ribl.png"))
+      
+      riblPlot <- newFigure(file.path("Ribl.png"),"Barplot of the percentage of reads in blacklists",
+                            type = IMAGE.TYPE.RASTER, exportId = NULL,
+                            protection = PROTECTION.PUBLIC)
+      
+   } else {
+      riblPlot <- NULL
+   }
+   
+   if(sum(unlist(lapply(peaks(object),length)))>0) {
+      ggsave(plotFrip(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Rip.png"))
+      ggsave(plotRap(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Rap.png"))
+      ggsave(plotPeakProfile(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"PeakProfile.png"))
+   }
+   png(file.path(reportFolder,"PeakCorHeatmap.png"),width=600,height=600)
+  # plotCorHeatmap(object,attributes=c(facetBy,colourBy))
+   dev.off()
+   png(file.path(reportFolder,"PeakPCA.png"),width=600,height=600)
+  # plotPrincomp(object,attributes=facetBy,label=colourBy)
+   dev.off()
+   ripPlot <- newFigure(file.path("Rip.png"),"Barplot of the percentage number of reads in peaks",
+                        type = IMAGE.TYPE.RASTER, exportId = NULL,
+                        protection = PROTECTION.PUBLIC)
+   rapPlot <- newFigure(file.path("Rap.png"),"Density plot of the number of reads in peaks",
+                        type = IMAGE.TYPE.RASTER, exportId = NULL,
+                        protection = PROTECTION.PUBLIC)
+   peakProfilePlot <- newFigure(file.path("PeakProfile.png"),"Plot of the average signal profile across peaks",
+                                type = IMAGE.TYPE.RASTER, exportId = NULL,
+                                protection = PROTECTION.PUBLIC)
+   peakCorHeatmap <- newFigure(file.path("PeakCorHeatmap.png"),"Plot of correlation between peaksets",
+                               type = IMAGE.TYPE.RASTER, exportId = NULL,
+                               protection = PROTECTION.PUBLIC)  
+   peakPrinComp <- newFigure(file.path("PeakPCA.png"),"PCA of peaksets",
+                             type = IMAGE.TYPE.RASTER, exportId = NULL,
+                             protection = PROTECTION.PUBLIC)   
+   
+   
+   
+   
+   qcreport <- newCustomReport( "ChIPQC Report" );
+   
+   introductionSection <- makeIntroduction(object)
+   summarySection <- makeSummarySection(object)
+   mfdSubSection <- makeMFDSection(object,riblPlot,gfePlot)
+   distAndStructureSubSection <- makeDistAndStrucSection(object,covhistPlot,ccPlot)
+   peakProfileSubSection <- makePeakProfileSection(object,ripPlot,rapPlot,peakProfilePlot,peakCorHeatmap,peakPrinComp)
+   versionSection <- makeSessionInfoSection()
+   
+   
+   
+   resultsSection <- newSection( "QC Results" );
+   resultsSection <- addTo(resultsSection,
+                           mfdSubSection,
+                           distAndStructureSubSection,
+                           peakProfileSubSection
+   );
+   
+   
+   
+   
+   qcreport <- addTo(qcreport,introductionSection,summarySection,resultsSection,versionSection)
+   writeReport(qcreport,file.path(reportFolder,reportName))
+   
+   html <- readLines(file.path(reportFolder,paste(reportName,"html",sep=".")))
+   htmlID <- gsub("\">","",strsplit(html[grep("div class=\"report\" id=\"",html)],"id=\"")[[1]][2])
+   html[grep(">ChIPQC Report<",html)+1] <- 
+      gsub(">",paste0("id=\"overview_",htmlID,"\">"),html[grep(">ChIPQC Report<",html)+1])
+   
+   html[grep(">QC files and versions<",html)+6] <-
+      gsub(">",paste0("id=\"summary_",htmlID,"\">"),html[grep(">QC files and versions<",html)+6])          
+   
+   write(html,file=file.path(reportFolder,paste(reportName,"html",sep=".")))
+   if (interactive()) browseURL(paste0("file://",normalizePath(file.path(reportFolder,paste(reportName,"html",sep=".")))))
+   
+})
+
+
 setMethod("ChIPQCreport", "ChIPQCsample", function(object,
                                                    reportName="ChIPQC",reportFolder="ChIPQCreport"){
   dir.create(reportFolder, showWarnings=FALSE)

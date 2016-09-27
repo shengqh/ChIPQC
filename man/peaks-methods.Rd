@@ -4,6 +4,7 @@
 \alias{peaks-methods}
 \alias{peaks,ChIPQCexperiment-method}
 \alias{peaks,ChIPQCsample-method}
+\alias{peaks,list-method}
 \title{Retrieve peaks}
 \description{
 Retrieve peaks.
@@ -13,6 +14,10 @@ Retrieve peaks.
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{\link{GRangesList}} of the peaks associated with all the samples in an experiment.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{\link{GRangesList}} of the peaks associated with all the samples in a list of ChIPQCsample objects.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{
