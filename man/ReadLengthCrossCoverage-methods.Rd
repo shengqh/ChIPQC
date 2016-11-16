@@ -4,6 +4,8 @@
 \alias{ReadLengthCrossCoverage-methods}
 \alias{ReadLengthCrossCoverage,ChIPQCexperiment-method}
 \alias{ReadLengthCrossCoverage,ChIPQCsample-method}
+\alias{ReadLengthCrossCoverage,list-method}
+
 \title{Retrieve the cross coverage values without extending reads}
 \description{
 Retrieve the cross coverage values without extending reads.
@@ -13,6 +15,10 @@ Retrieve the cross coverage values without extending reads.
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{vector} of cross-coverage values for all samples in a ChIP-seq experiment, with no shift.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{vector} of cross-coverage values for all samples  in a list of ChIPQCsample objects, with no shift.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

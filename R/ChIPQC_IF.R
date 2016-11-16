@@ -2,7 +2,17 @@ ChIPQCsample = function(reads, peaks, annotation=NULL, chromosomes=NULL,
                         mapQCth=15, blacklist, profileWin=400,fragmentLength=125,shifts=1:300,runCrossCor=FALSE,verboseT=TRUE) {
    
    if(missing(peaks)) peaks=NULL
+   if(!missing(peaks)){
+      if(!is.null(peaks)){
+         if(is.na(peaks)) peaks=NULL
+      }
+   }
    if(missing(blacklist)) blacklist=NULL
+   if(!missing(blacklist)){
+      if(!is.null(blacklist)){
+         if(is.na(blacklist)) blacklist=NULL
+      }
+   }
    res = sampleQC(bamFile=reads, bedFile=peaks, GeneAnnotation=annotation,blklist=blacklist,ChrOfInterest=chromosomes,
                   Window=profileWin,FragmentLength=fragmentLength,
                   shiftWindowStart=min(shifts),shiftWindowEnd=max(shifts),runCrossCor=runCrossCor,verboseT=verboseT)
@@ -133,7 +143,7 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
       addcontrols = TRUE
       if(consensus==FALSE) {
          setNull <- TRUE
-         peaks = dba.peakset(experiment,bRetrieve=T,
+         peaks = dba.peakset(experiment,bRetrieve=TRUE,
                              DataType=DBA_DATA_FRAME)[,1:4]      
       }
    } 

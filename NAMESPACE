@@ -53,7 +53,7 @@ importFrom(Nozzle.R1, addTo, asLink, asStrong, newCustomReport,
 
 importFrom(reshape2, melt)
 
-importFrom(GenomicFeatures, fiveUTRsByTranscript, threeUTRsByTranscript, cdsBy, intronsByTranscript,
+importFrom(GenomicFeatures, fiveUTRsByTranscript, "seqlevels<-", threeUTRsByTranscript, cdsBy, intronsByTranscript,
                             transcripts)
 
 importFrom(Rsamtools, bamFlagAsBitMatrix, BamFile, index, indexBam)
@@ -88,6 +88,7 @@ exportMethods(
     "plotRap",
     "plotCoverageHist",
     "plotRegi",
+    "plotSSD",
     "frip",
     "rip",
     "ribl",
@@ -114,7 +115,7 @@ exportClasses(
     "ChIPQCexperiment"
 )
 
-#importFrom(TxDb.Hsapiens.UCSC.hg20.knownGene,TxDb.Hsapiens.UCSC.hg20.knownGene)
+importFrom(TxDb.Hsapiens.UCSC.hg38.knownGene,TxDb.Hsapiens.UCSC.hg38.knownGene)
 importFrom(TxDb.Hsapiens.UCSC.hg19.knownGene,TxDb.Hsapiens.UCSC.hg19.knownGene)
 importFrom(TxDb.Hsapiens.UCSC.hg18.knownGene,TxDb.Hsapiens.UCSC.hg18.knownGene)
 importFrom(TxDb.Mmusculus.UCSC.mm10.knownGene, TxDb.Mmusculus.UCSC.mm10.knownGene)

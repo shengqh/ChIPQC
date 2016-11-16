@@ -4,6 +4,7 @@
 \alias{mapped}
 \alias{mapped,ChIPQCexperiment-method}
 \alias{mapped,ChIPQCsample-method}
+\alias{mapped,list-method}
 \title{Retrieve numbers of mapped reads}
 \description{
 Retrieve the numbers of mapped reads.
@@ -13,6 +14,10 @@ Retrieve the numbers of mapped reads.
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{vector} of the numbers of mapped (aligned) reads for each sample in an experiment.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{vector} of the numbers of mapped (aligned) reads for each sample in a list of ChIPQCsample objects.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

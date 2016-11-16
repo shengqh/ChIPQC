@@ -41,6 +41,8 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
   CovHist <- NULL
   Cov <- NULL
   SSD <- NULL
+  PosAny <- NULL
+  NegAny <- NULL
   SSDBL <- NULL
   readlength <- as.numeric(NA)
   CoverageMatrix <- NULL
@@ -48,9 +50,13 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
   bedRangesTemp <- GetGRanges(GRanges(),AllChr=names(ChrLengths))
   bedRangesSummitsTemp <- vector("numeric")
   Counts <- NULL
+  LeftPosBiasTemp <- NULL
+  RightNegBiasTemp <- NULL
+  meanBiasTemp <- NULL
   MultiRangesCountsTemp <- NULL
   txdb <- NULL
   GeneAnnotationTotalSizes <- NULL
+
   if(class(GeneAnnotation)!="list" & !is.null(GeneAnnotation)) {
     GeneAnnotation = getAnnotation(GeneAnnotation,AllChr=names(ChrLengths))
     
@@ -84,7 +90,14 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       emptyChr_SSDBL <- 0
       names(emptyChr_SSDBL) <- names(ChrLengths)[k]
       SSDBL <- c(SSD,emptyChr_SSDBL)
-      
+
+      emptyChr_PosAny <- 0
+      names(emptyChr_PosAny) <- names(ChrLengths)[k]
+      PosAny <- c(PosAny,emptyChr_PosAny)      
+
+      emptyChr_NegAny <- 0
+      names(emptyChr_NegAny) <- names(ChrLengths)[k]
+      NegAny <- c(NegAny,emptyChr_NegAny)      
       
       ShiftMattemp <- matrix(rep(0,(shiftWindowEnd-shiftWindowStart)+1),ncol=1)
       colnames(ShiftMattemp) <- names(ChrLengths)[k]
@@ -110,9 +123,9 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       FlagTagCounts <- rbind(cbind(UnMapped,Mapped,Duplicates,MapQPass,MapQPassAndDup),FlagTagCounts)
       
       
-      MapQPass <- sum(temp[temp[,"A"] != 1 & as.numeric(as.vector(temp[,"C"])) >= 15,"Freq"])
-      MapQPassAndDup <- sum(temp[temp[,"A"] != 1 & temp[,"B"] == 1 & as.numeric(as.vector(temp[,"C"])) >= mapQCutoff,"Freq"])
-      FlagTagCounts <- rbind(cbind(UnMapped,Mapped,Duplicates,MapQPass,MapQPassAndDup),FlagTagCounts)
+      # MapQPass <- sum(temp[temp[,"A"] != 1 & as.numeric(as.vector(temp[,"C"])) >= 15,"Freq"])
+      # MapQPassAndDup <- sum(temp[temp[,"A"] != 1 & temp[,"B"] == 1 & as.numeric(as.vector(temp[,"C"])) >= mapQCutoff,"Freq"])
+      # FlagTagCounts <- rbind(cbind(UnMapped,Mapped,Duplicates,MapQPass,MapQPassAndDup),FlagTagCounts)
       
       
       Cov <- coverage(Sample_GIT,width=unname(ChrLengths[k]))
@@ -132,6 +145,14 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       
       PosCoverage <- coverage(IRanges(start(Sample_GIT[strand(Sample_GIT)=="+"]),start(Sample_GIT[strand(Sample_GIT)=="+"])),width=ChrLengths[k])
       NegCoverage <- coverage(IRanges(end(Sample_GIT[strand(Sample_GIT)=="-"]),end(Sample_GIT[strand(Sample_GIT)=="-"])),width=ChrLengths[k])
+      if(verboseT == T){
+         
+         message("Calculating unique positions per strand for ",names(ChrLengths)[k],"\n")
+         
+      }    
+      PosAny <- c(PosAny,sum(runLength((PosCoverage[PosCoverage > 1]))))
+      NegAny <- c(NegAny,sum(runLength((NegCoverage[NegCoverage > 1]))))
+      
       if(verboseT == T){
         
         message("Calculating shift for ",names(ChrLengths)[k],"\n")
@@ -208,9 +229,8 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       if(!is.null(bedFile)){
         CountsTemp <- countOverlaps(bedRanges,Sample_GIT)
         Counts  <- c(Counts,CountsTemp)
-        
         bedRangesTemp <- c(bedRangesTemp,bedRanges)
-        if(verboseT == T){
+        if(verboseT == TRUE){
           
           message("Signal over peaks for ",names(ChrLengths)[k],"\n")                   
         }
@@ -223,11 +243,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       }
     }
   }
-  if(!is.null(FlagTagCounts)){
-    FlagTagCounts <- colSums(FlagTagCounts)
-  }else{
-    FlagTagCounts <- as.numeric(data.frame(UnMapped=0,Mapped=0,Duplicates=0,MapQPass=0,MapQPassAndDup=0))
-  }
+
   Weights <- ChrLengths
   CovHistAll <- NULL
   if(!is.null(CovHist)){
@@ -246,9 +262,21 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
   }
   if(!is.null(ShiftMat)){
     ShiftsAv <- apply(ShiftMat,1,function(x)weighted.mean(x,Weights[colnames(ShiftMat)],na.rm=TRUE))
+
   }else{
     ShiftsAv <- as.numeric(NA)
+
   }
+  if(!is.null(PosAny) & !is.null(NegAny)){   
+     PosAny <- unname((sum(NegAny)))+unname((sum(PosAny)))
+  }else{
+     PosAny <- as.numeric(NA)     
+  }  
+  if(!is.null(FlagTagCounts)){
+     FlagTagCounts <- c(colSums(FlagTagCounts),DuplicateByChIPQC=PosAny)
+  }else{
+     FlagTagCounts <- as.numeric(data.frame(UnMapped=0,Mapped=0,Duplicates=0,MapQPass=0,MapQPassAndDup=0,DuplicateByChIPQC=0))
+  }  
   if(!is.null(ShiftMatCor)){
     ShiftsCorAv <- apply(ShiftMatCor,1,function(x)weighted.mean(x,Weights[colnames(ShiftMatCor)],na.rm=TRUE))
   }else{
@@ -259,7 +287,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
   }else{
     SSDAv <- as.numeric(NA)     
   }
-  
+
   if(!is.null(MultiRangesCountsTemp)){
     GFCountsMatrix <- matrix(MultiRangesCountsTemp,ncol=length(GRangesOfInterestList),byrow=TRUE)
     colnames(GFCountsMatrix) <- unique(names(GRangesOfInterestList))
@@ -270,7 +298,9 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
   if(!is.null(bedFile)){
     AvProfile <- colMeans(CoverageMatrix)
     NormAvProfile <- (AvProfile/FlagTagCounts[4])*1e6
-    elementMetadata(bedRangesTemp) <- data.frame(Counts,bedRangesSummitsTemp)
+
+      elementMetadata(bedRangesTemp) <- data.frame(Counts,bedRangesSummitsTemp)
+    
     #print(length(GRangesOfInterestList))
     ReadsInPeaks <- sum(GFCountsMatrix[,"Peaks"])
   }else{
@@ -474,9 +504,9 @@ getAnnotation = function(GeneAnnotation="hg19",AllChr){
     if(GeneAnnotation == "hg19"){
       #require(TxDb.Hsapiens.UCSC.hg19.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-    } else if(GeneAnnotation == "hg20"){
+    } else if(GeneAnnotation == "hg38"){
       #require(TxDb.Hsapiens.UCSC.hg20.knownGene)
-      txdb <- TxDb.Hsapiens.UCSC.hg20.knownGene        
+      txdb <- TxDb.Hsapiens.UCSC.hg38.knownGene        
     }else if(GeneAnnotation == "hg18"){
       #require(TxDb.Hsapiens.UCSC.hg18.knownGene)
       txdb <- TxDb.Hsapiens.UCSC.hg18.knownGene        

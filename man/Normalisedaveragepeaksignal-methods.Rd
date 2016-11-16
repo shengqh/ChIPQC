@@ -4,6 +4,7 @@
 \alias{Normalisedaveragepeaksignal-methods}
 \alias{Normalisedaveragepeaksignal,ChIPQCexperiment-method}
 \alias{Normalisedaveragepeaksignal,ChIPQCsample-method}
+\alias{Normalisedaveragepeaksignal,list-method}
 \title{Retrieve normalised average peak profiles}
 \description{
 Retrieve normalised average peak profiles
@@ -13,6 +14,10 @@ Retrieve normalised average peak profiles
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{matrix} of normalised average peak signal data for all samples in a ChIP-seq experiment. Each column represents a sample, and each row a base pair position, centered on peak summits. 
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{matrix} of normalised average peak signal data for all samples in a list of ChIPQCsample objects. Each column represents a sample, and each row a base pair position, centered on peak summits. 
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

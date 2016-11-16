@@ -4,6 +4,7 @@
 \alias{frip-methods}
 \alias{frip,ChIPQCexperiment-method}
 \alias{frip,ChIPQCsample-method}
+\alias{frip,list-method}
 \title{Retrieve fraction of reads in peaks}
 \description{
 Retrieve the fraction of reads in peaks
@@ -13,6 +14,10 @@ Retrieve the fraction of reads in peaks
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{vector} of values representing the proportion of reads that overlap peaks for each sample in an experiment.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{vector} of values representing the proportion of reads that overlap peaks for each sample in a list of ChIPQCsample objects.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

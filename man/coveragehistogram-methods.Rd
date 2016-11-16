@@ -4,6 +4,7 @@
 \alias{coveragehistogram-methods}
 \alias{coveragehistogram,ChIPQCexperiment-method}
 \alias{coveragehistogram,ChIPQCsample-method}
+\alias{coveragehistogram,list-method}
 \title{Retrieve histogram data representing densities of coverage pileups}
 \description{
 Retrieve histogram data representing densities of coverage pileups.
@@ -13,6 +14,10 @@ Retrieve histogram data representing densities of coverage pileups.
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{matrix} of coverage histogram data for all samples in a ChIP-seq experiment. Each column represents a sample, and each row a pileup height, with the value representing the number of basepair positions that report this pileup height.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{matrix} of coverage histogram data for all ChIPQCsamples in a list. Each column represents a sample, and each row a pileup height, with the value representing the number of basepair positions that report this pileup height.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

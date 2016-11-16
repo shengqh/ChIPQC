@@ -4,6 +4,7 @@
 \alias{regi-methods}
 \alias{regi,ChIPQCexperiment-method}
 \alias{regi,ChIPQCsample-method}
+\alias{regi,list-method}
 \title{Retrieve genomic profile information}
 \description{
 Retrieve genomic profile information in terms of relative enrichment over background genomic distribution.
@@ -13,6 +14,10 @@ Retrieve genomic profile information in terms of relative enrichment over backgr
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{matrix} of relative enrichment values for a variety of genomic features. Each column represents the enrichment values for one sample in the experiment.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{matrix} of relative enrichment values for a variety of genomic features. Each column represents the enrichment values for one sample in a list of ChIPQCsample objects.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

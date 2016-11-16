@@ -4,12 +4,23 @@
 \alias{plotRap}
 \alias{plotRap,ChIPQCexperiment-method}
 \alias{plotRap,ChIPQCsample-method}
+\alias{plotRap,list-method}
 \title{Generate reads in peaks plot}
 \description{
 Generate reads in peaks plot.
 }
 \section{Methods}{
 \describe{
+
+\item{\code{signature(object = "ChIPQCexperiment", type="barstacked",facet=T,
+                      facetBy=c("Tissue","Factor"))}}{
+Generate reads in peaks plots for all the samples in an experiment.
+}
+
+\item{\code{signature(object = "list", type="barstacked",facet=T,
+                      facetBy=c("Sample"))}}{
+Generate reads in peaks plots for all the samples in a list of ChIPQCsample objects.
+}
 
 \item{\code{signature(object = "ChIPQCexperiment", type="barstacked",facet=T,
                       facetBy=c("Tissue","Factor"))}}{

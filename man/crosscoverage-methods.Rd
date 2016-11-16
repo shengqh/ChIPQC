@@ -4,6 +4,7 @@
 \alias{crosscoverage-methods}
 \alias{crosscoverage,ChIPQCexperiment-method}
 \alias{crosscoverage,ChIPQCsample-method}
+\alias{crosscoverage,list-method}
 \title{Retrieve the cross coverage values for a range of shift sizes}
 \description{
 Retrieves the cross-coverage values for a range of shift sizes.
@@ -13,6 +14,10 @@ Retrieves the cross-coverage values for a range of shift sizes.
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{matrix} of cross-coverage data for all samples in an ChIP-seq experiment. Each column represents a sample, and each row a shift size, with the value representing the cross-coverage using that size read.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{matrix} of cross-coverage data for all samples in a list of ChIPQCsample objects. Each column represents a sample, and each row a shift size, with the value representing the cross-coverage using that size read.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{
