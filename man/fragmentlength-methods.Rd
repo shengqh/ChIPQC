@@ -4,6 +4,7 @@
 \alias{fragmentlength}
 \alias{fragmentlength,ChIPQCexperiment-method}
 \alias{fragmentlength,ChIPQCsample-method}
+\alias{fragmentlength,list-method}
 \title{Retrieve the estimated fragment length}
 \description{
 Retrieve the estimated fragment length.
@@ -13,6 +14,10 @@ Retrieve the estimated fragment length.
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{vector} of estimated fragments sizes, one for each sample in the experiment.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{vector} of estimated fragments sizes, one for each sample in a list of ChIPQCsample objects.
 }
 
 \item{\code{signature(object = "ChIPQCsample", width)}}{

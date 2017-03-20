@@ -1,22 +1,24 @@
 do_plotCorHeatmap = function(object,attributes,...) {
    if(sum(as.numeric(as.vector(dba.show(QCdba(object))$Intervals)))==0) {
-      stop('No peaks to plot.')      
+      message('No peaks to plot.')      
+   }else{
+      atts=getAtts(attributes=attributes)  
+      x = suppressWarnings(dba.plotHeatmap(object,attributes=atts,...))
+      invisible(x)
    }
-   atts=getAtts(attributes=attributes)  
-   x = suppressWarnings(dba.plotHeatmap(object,attributes=atts,...))
-   invisible(x)
 }
 
 do_plotPCA = function(object,attributes,label,...) {
    if(sum(as.numeric(as.vector(dba.show(QCdba(object))$Intervals)))==0) {
-      stop('No peaks to plot.')      
-   }
+      message('No peaks to plot.')      
+   }else{
    atts=getAtts(attributes=attributes)
    if(!missing(label)){
       label=getAtts(attributes=label)
    }
    x = suppressWarnings(dba.plotPCA(object,attributes=atts,label=label,...))
    return(x)
+   }
 }
 
 setGeneric("plotCorHeatmap", function(object="ChIPQCexperiment",attributes,...) standardGeneric("plotCorHeatmap"))

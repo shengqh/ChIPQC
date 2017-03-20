@@ -4,6 +4,7 @@
 \alias{ChIPQCreport}
 \alias{ChIPQCreport,ChIPQCexperiment-method}
 \alias{ChIPQCreport,ChIPQCsample-method}
+\alias{ChIPQCreport,list-method}
 \title{Generate a summary QC report}
 \description{
 Generate an HTML summary QC report.
@@ -27,6 +28,25 @@ facetBy \tab metadata fields to use for faceting\cr
 colourBy \tab metadata field to color by\cr
 }
 }
+
+
+\item{\code{signature(experiment = "list", facet=TRUE, 
+                      reportName="ChIPQC", reportFolder="ChIPQCreport",
+                      facetBy=c("Sample"),
+                      colourBy=c("Sample"))}}{
+
+Generates an summary QC report for a list of ChIPQCsample objects in HTML format.
+
+\tabular{ll}{
+experiment \tab \code{\link{list}} object\cr
+facet \tab logical indicating whether or not to facet using experimental metadata.\cr
+reportName \tab filename of main report file (.html).\cr
+reportFolder \tab directory name where plot graphics will be saved\cr
+facetBy \tab metadata fields to use for faceting\cr
+colourBy \tab metadata field to color by\cr
+}
+}
+
 
 \item{\code{signature(sample = "ChIPQCsample", 
                       reportName="ChIPQC", reportFolder="ChIPQCreport",)}}{

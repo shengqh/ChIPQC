@@ -102,6 +102,7 @@ exportMethods(
     "QCdba",
     "plotRap",
     "plotRegi",
+    "plotSSD",
     "reads",
     "duplicates",
     "duplicateRate",

@@ -4,6 +4,7 @@
 \alias{flagtagcounts-methods}
 \alias{flagtagcounts,ChIPQCexperiment-method}
 \alias{flagtagcounts,ChIPQCsample-method}
+\alias{flagtagcounts,list-method}
 \title{Retrieve numbers of reads that pass various filters}
 \description{
 Retrieve numbers of reads that pass various filters
@@ -13,6 +14,10 @@ Retrieve numbers of reads that pass various filters
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{matrix} of counts passing various filters for all the samples in an experiment. Each column represents the counts in a sample.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{matrix} of counts passing various filters for all the samples in a list of ChIPQCsample objects. Each column represents the counts in a sample.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

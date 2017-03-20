@@ -4,6 +4,7 @@
 \alias{RelativeCrossCoverage-methods}
 \alias{RelativeCrossCoverage,ChIPQCexperiment-method}
 \alias{RelativeCrossCoverage,ChIPQCsample-method}
+\alias{RelativeCrossCoverage,list-method}
 \title{Retrieve the relative cross coverage values for a range of shift sizes}
 \description{
 Retrieve the relative cross-coverage values for a range of shift sizes 
@@ -13,6 +14,10 @@ Retrieve the relative cross-coverage values for a range of shift sizes
 
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{vector} of relative cross-coverage values for all samples in a ChIP-seq experiment, computed based on the maximal value (when extending the reads to the  optimal fragment length) versus the cross-coverage values using non-extended reads.
+}
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{vector} of relative cross-coverage values for all samples in a list of ChIPQCsample objects, computed based on the maximal value (when extending the reads to the  optimal fragment length) versus the cross-coverage values using non-extended reads.
 }
 
 \item{\code{signature(object = "ChIPQCsample")}}{

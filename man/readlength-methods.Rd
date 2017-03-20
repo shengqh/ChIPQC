@@ -4,6 +4,7 @@
 \alias{readlength}
 \alias{readlength,ChIPQCexperiment-method}
 \alias{readlength,ChIPQCsample-method}
+\alias{readlength,list-method}
 \title{Retrieve read length values}
 \description{
 Retrieve read length values.
@@ -14,6 +15,11 @@ Retrieve read length values.
 \item{\code{signature(object = "ChIPQCexperiment")}}{
 Retrieve a \code{vector} of read length values, one for each sample in an experiment.
 }
+
+\item{\code{signature(object = "list")}}{
+Retrieve a \code{vector} of read length values, one for each sample in a list of ChIPQCsample objects.
+}
+
 
 \item{\code{signature(object = "ChIPQCsample")}}{
 Retrieve the read length value for a sample.
