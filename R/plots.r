@@ -380,11 +380,11 @@ setMethod("plotCoverageHist", "ChIPQCsample", function(object,maxDepthToPlot=100
 ########################################################
 ########################################################
 makeFripPlot <- function(fripDataFrame){
-  
+  fripDataFrame$Reads <- factor(as.vector(fripDataFrame$Reads),levels = c("OutSide","Inside"))
   P <- ggplot(fripDataFrame, aes(Sample,FRIP, fill=Reads))
   P <- P+geom_bar(stat="identity")
   P <- P+labs(title = "Percentage of Reads In Peaks")
-  P <- P+theme(axis.title.y=element_text(angle=0),panel.background = element_blank())+scale_fill_manual(values=c( "#000099","#CCCCFF"))
+  P <- P+theme(axis.title.y=element_text(angle=0),panel.background = element_blank())+scale_fill_manual(values=c( "#CCCCFF","#000099"))
   
   return(P)
 }
@@ -414,15 +414,15 @@ setMethod("plotFrip", "ChIPQCexperiment", function(object,type="barstacked",face
   fripDataFrame <- melt(toMelt)
   
   
-  metadataOpts <- mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)        
+  metadataOpts <- ChIPQC:::mergeMetadata(object,addMetaData,facetBy,colourBy=NULL,lineBy=NULL)        
   
   
   fripDataFrameWithMetaData <- merge(fripDataFrame,metadataOpts$metadata,by.x=1,by.y=1,all=FALSE)      
   colnames(fripDataFrameWithMetaData)[1:3] <- c("Sample","Reads","FRIP")
   fripDataFrameWithMetaData <- fripDataFrameWithMetaData[order(fripDataFrameWithMetaData[,"Sample"],fripDataFrameWithMetaData[,"Reads"]),]
-  Plot <- makeFripPlot(fripDataFrameWithMetaData)
+  Plot <- ChIPQC:::makeFripPlot(fripDataFrameWithMetaData)
   if(facet){
-    metadataOpts$facetBy$free$x <- TRUE
+    metadataOpts$facetBy$params$free$x <- TRUE
     Plot <- Plot + 
       metadataOpts$facetBy 
   }
@@ -458,7 +458,7 @@ setMethod("plotFrip", "list", function(object,type="barstacked",facet=TRUE,
   fripDataFrameWithMetaData <- fripDataFrameWithMetaData[order(fripDataFrameWithMetaData[,"Sample"],fripDataFrameWithMetaData[,"Reads"]),]
   Plot <- makeFripPlot(fripDataFrameWithMetaData)
   if(facet){
-    metadataOpts$facetBy$free$x <- TRUE
+    metadataOpts$facetBy$params$free$x <- TRUE
     Plot <- Plot + 
       metadataOpts$facetBy 
   }
@@ -487,11 +487,12 @@ setMethod("plotFrip", "ChIPQCsample", function(object,type="barstacked",facet=TR
 ###############
 ###############
 makeFriblPlot <- function(friblDataFrame){
+  friblDataFrame$Reads <- factor(as.vector(friblDataFrame$Reads),levels = c("OutSide","Inside"))
   
   P <- ggplot(friblDataFrame, aes(Sample,FRIBL, fill=Reads))
   P <- P+geom_bar(stat="identity")
   P <- P+labs(title = "Percentage Of Reads In Blacklists")
-  P <- P+theme(axis.title.y=element_text(angle=0),panel.background = element_blank())+scale_fill_manual(values=c( "#000099","#CCCCFF"))      
+  P <- P+theme(axis.title.y=element_text(angle=0),panel.background = element_blank())+scale_fill_manual(values=c( "#CCCCFF","#000099"))      
   return(P)
 }
 
@@ -527,7 +528,7 @@ setMethod("plotFribl", "ChIPQCexperiment", function(object,type="barstacked",fac
   friblDataFrameWithMetaData <- friblDataFrameWithMetaData[order(friblDataFrameWithMetaData[,"Sample"],friblDataFrameWithMetaData[,"Reads"]),]
   Plot <- makeFriblPlot(friblDataFrameWithMetaData)
   if(facet){
-    metadataOpts$facetBy$free$x <- TRUE
+    metadataOpts$facetBy$params$free$x <- TRUE
     Plot <- Plot + 
       metadataOpts$facetBy 
   }
@@ -565,7 +566,7 @@ setMethod("plotFribl", "list", function(object,type="barstacked",facet=TRUE,
   friblDataFrameWithMetaData <- friblDataFrameWithMetaData[order(friblDataFrameWithMetaData[,"Sample"],friblDataFrameWithMetaData[,"Reads"]),]
   Plot <- makeFriblPlot(friblDataFrameWithMetaData)
   if(facet){
-    metadataOpts$facetBy$free$x <- TRUE
+    metadataOpts$facetBy$params$free$x <- TRUE
     Plot <- Plot + 
       metadataOpts$facetBy 
   }
@@ -681,7 +682,7 @@ setMethod("plotRap", "list", function(object,facet=TRUE,
   
   Plot <- makeRapPlot(rapDataFrameWithMetaData)
   
-  metadataOpts$facetBy[2]$free$x <- TRUE
+  metadataOpts$facetBy$params[2]$free$x <- TRUE
   if(facet){
     Plot <- Plot + metadataOpts$facetBy 
   }
