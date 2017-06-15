@@ -453,7 +453,7 @@ GetGRanges <- function(LoadFile,AllChr=NULL,ChrOfInterest=NULL,simple=FALSE,sepr
   }
   if(!is.null(AllChr)){ 
     RegionRanges <- RegionRanges[seqnames(RegionRanges) %in% AllChr]    
-    seqlevels(RegionRanges,force=TRUE) <- AllChr
+    seqlevels(RegionRanges,pruning.mode="coarse") <- AllChr
   }
   if(!is.null(ChrOfInterest)){      
     RegionRanges <- RegionRanges[seqnames(RegionRanges) == ChrOfInterest]      
