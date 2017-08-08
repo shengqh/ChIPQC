@@ -2,6 +2,12 @@
 \title{ChIPQC News}
 \encoding{UTF-8}
 
+\section{Version 1.13.2}{
+ \itemize{
+  \item{Fixed bug when specifying consensus peakset as GRanges}
+  }
+}
+
 \section{Version 1.9.2}{
  \itemize{
   \item{Dependancy cleanup; update handling of how control samples are added}
