@@ -26,7 +26,7 @@ setMethod("show","ChIPQCsample",
              message("Percentage Of Reads in Peaks: ",round((object@CountsInPeaks/object@FlagAndTagCounts[4])*100,digits=2),"")            
              message("Number of Peaks: ",length(object),"")    
              
-             print(as(object,"GRanges"))
+             print(granges(object, use.mcols=TRUE))
           }
 )
 
@@ -75,7 +75,7 @@ setMethod("averagepeaksignal", "ChIPQCsample", function(object) object@AveragePe
 setGeneric("Normalisedaveragepeaksignal", function(object="ChIPQCsample") standardGeneric("Normalisedaveragepeaksignal"))
 setMethod("Normalisedaveragepeaksignal", "ChIPQCsample", function(object) object@AveragePeakSignal[[2]])
 setGeneric("peaks", function(object="ChIPQCsample") standardGeneric("peaks"))
-setMethod("peaks", "ChIPQCsample", function(object) as(object,"GRanges"))
+setMethod("peaks", "ChIPQCsample", function(object) granges(object, use.mcols=TRUE))
 setGeneric("readlength", function(object="ChIPQCsample") standardGeneric("readlength"))
 setMethod("readlength", "ChIPQCsample", function(object) object@readlength)
 
