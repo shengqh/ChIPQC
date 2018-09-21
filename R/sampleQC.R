@@ -532,7 +532,7 @@ getAnnotation = function(GeneAnnotation="hg19",AllChr){
     All3utrs <- reduce(unique(unlist(threeUTRsByTranscript(txdb))))
     Allcds <- reduce(unique(unlist(cdsBy(txdb,"tx"))))
     Allintrons <- reduce(unique(unlist(intronsByTranscript(txdb))))
-    Alltranscripts <- reduce(unique(unlist(transcripts(txdb))))
+    Alltranscripts <- reduce(unique(transcripts(txdb)))
     
     posAllTranscripts <- Alltranscripts[strand(Alltranscripts) == "+"]
     posAllTranscripts <- posAllTranscripts[!(start(posAllTranscripts)-20000 < 0)]
