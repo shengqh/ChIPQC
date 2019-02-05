@@ -108,7 +108,8 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
         readlength=round(mean(width(temp[1:tocheckforreads])))
       }
       
-      Sample_GIT <- GNCList(GRanges(seqnames=seqnames(temp),ranges=ranges(temp),strand=strand(temp),elementMetadata(temp)))
+      # Sample_GIT <- GNCList(GRanges(seqnames=seqnames(temp),ranges=ranges(temp),strand=strand(temp),elementMetadata(temp)))
+      Sample_GIT <- GRanges(seqnames=seqnames(temp),ranges=ranges(temp),strand=strand(temp),elementMetadata(temp))
       
       flagMapQ <- cbind(bamFlagAsBitMatrix(Sample_GIT$flag)[,c("isUnmappedQuery","isDuplicate"),drop=FALSE],Sample_GIT$mapq)
       colnames(flagMapQ) <- c("A","B","C")
