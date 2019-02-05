@@ -13,11 +13,11 @@ Generate Cross-Coverage plots.
 \describe{
 
 \item{\code{signature(object = "ChIPQCexperiment", method)}}{
-Generate cross-coverage plots for all the samples in an experiment. 
+Generate cross-coverage plots for all the samples in an experiment.
 }
 
 \item{\code{signature(object = "list", method)}}{
-Generate cross-coverage plots for list of samples in an experiment. 
+Generate cross-coverage plots for list of samples in an experiment.
 }
 
 \item{\code{signature(object = "ChIPQCsample", methods)}}{
