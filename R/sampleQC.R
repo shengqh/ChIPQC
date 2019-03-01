@@ -171,6 +171,12 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       
       if(!is.null(bedFile)){
         bedRanges <- GetGRanges(bedFile,as.vector(names(ChrLengths)),names(ChrLengths)[k])
+        toFilterOutOfBounds <- start(bedRanges)-Window < 0 |
+          end(bedRanges)+Window > unname(ChrLengths[names(ChrLengths) == names(ChrLengths)[k]])
+        if(any(toFilterOutOfBounds)){
+          message("removing",sum(toFilterOutOfBounds),"peaks within ",Window,"bp of chromosome edges")
+          bedRanges <- bedRanges[!toFilterOutOfBounds]
+        }
         GRangesOfInterestList <- GRangesList(GRanges(seqnames(bedRanges),ranges(bedRanges)))
         names(GRangesOfInterestList) <- c(names(GRangesOfInterestList),"Peaks")
         seqlevels(GRangesOfInterestList) <- names(ChrLengths)
