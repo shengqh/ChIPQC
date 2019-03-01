@@ -14,10 +14,7 @@ table_RleList <- function(x)
 
 sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAnnotation=NULL,Window=400,FragmentLength=50,
                      shiftWindowStart=1,shiftWindowEnd=2,mapQCutoff=15,runCrossCor=FALSE,verboseT=TRUE){
-  #    require(Rsamtools)
-  #    require(GenomicRanges)
-  #    require(GenomicAlignments)
-  
+
   ChrLengths <- scanBamHeader(bamFile)[[1]]$targets
 
   if(length(ChrLengths[ChrLengths < shiftWindowEnd - shiftWindowStart]) > 0){
@@ -170,6 +167,12 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       
       if(!is.null(bedFile)){
         bedRanges <- GetGRanges(bedFile,as.vector(names(ChrLengths)),names(ChrLengths)[k])
+        toFilterOutOfBounds <- start(bedRanges)-Window < 0 |
+                                      end(bedRanges)+Window > unname(ChrLengths[names(ChrLengths) == names(ChrLengths)[k]])
+        if(any(toFilterOutOfBounds)){
+          message("removing",sum(toFilterOutOfBounds),"peaks within ",Window,"bp of chromosome edges")
+          bedRanges <- bedRanges[!toFilterOutOfBounds]
+        }
         GRangesOfInterestList <- GRangesList(GRanges(seqnames(bedRanges),ranges(bedRanges)))
         names(GRangesOfInterestList) <- c(names(GRangesOfInterestList),"Peaks")
         seqlevels(GRangesOfInterestList) <- names(ChrLengths)
