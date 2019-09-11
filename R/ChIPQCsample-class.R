@@ -150,13 +150,21 @@ setMethod("mapped", "ChIPQCsample", function(object){
 
 setGeneric("QCmetrics", function(object="ChIPQCsample") standardGeneric("QCmetrics"))
 setMethod("QCmetrics", "ChIPQCsample", function(object){
+   fl = fragmentlength(object,width=readlength(object))
+   rcc = signif(RelativeCrossCoverage(object),3)
+   if (length(fl) == 0){
+       fl = 0
+   }
+   if (length(rcc) == 0){
+       rcc = 0
+   }	   
    res        = c(reads(object,FALSE),
                   signif((mapped(object)/reads(object,FALSE))*100,3),
                   signif((1-reads(object,TRUE)/reads(object,FALSE))*100,3),
                   signif(duplicateRate(object)*100,3),
                   readlength(object),
-                  fragmentlength(object,width=readlength(object)),
-                  signif(RelativeCrossCoverage(object),3),
+                  fl,
+                  rcc,
                   #signif(FragmentLengthCrossCoverage(object),3),
                   #signif(ReadLengthCrossCoverage(object),3),
                   signif(ssd(object),3),
