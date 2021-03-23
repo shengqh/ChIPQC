@@ -320,7 +320,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
                            protection = PROTECTION.PUBLIC)
   
   if(sum(!apply(is.na(regi(object)),2,sum)>0)>0) {
-    ggsave(plotRegi(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=1*length(QCsample(object)),width=8)
+    ggsave(plotRegi(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=1*length(QCsample(object)),width=16)
     gfePlot <- newFigure(file.path("GenomicFeatureEnrichment.png"),"Heatmap of log2 enrichment of reads in genomic features",
                          type = IMAGE.TYPE.RASTER, exportId = NULL,
                          protection = PROTECTION.PUBLIC)
@@ -427,7 +427,7 @@ setMethod("ChIPQCreport", "list", function(object,facet=TRUE,
                             protection = PROTECTION.PUBLIC)
    
    if(sum(!apply(is.na(regi(object)),2,sum)>0)>0) {
-      ggsave(plotRegi(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=1*length(object),width=8)
+      ggsave(plotRegi(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=1*length(object),width=16)
       gfePlot <- newFigure(file.path("GenomicFeatureEnrichment.png"),"Heatmap of log2 enrichment of reads in genomic features",
                            type = IMAGE.TYPE.RASTER, exportId = NULL,
                            protection = PROTECTION.PUBLIC)
@@ -528,7 +528,7 @@ setMethod("ChIPQCreport", "ChIPQCsample", function(object,
                            protection = PROTECTION.PUBLIC)
   
   if(!all(is.na(object@CountsInFeatures))){
-    ggsave(plotRegi(object),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=3,width=8)
+    ggsave(plotRegi(object),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=3,width=16)
     gfePlot <- newFigure(file.path("GenomicFeatureEnrichment.png"),"Heatmap of log2 enrichment of reads in genomic features",
                          type = IMAGE.TYPE.RASTER, exportId = NULL,
                          protection = PROTECTION.PUBLIC)
