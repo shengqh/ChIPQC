@@ -25,7 +25,7 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
                   profileWin=400,fragmentLength=125,shifts=1:300,...) {
   
   if(class(experiment)=="character" || class(experiment)=="data.frame") {
-    experiment = dba(sampleSheet=experiment,bCorPlot=FALSE,peakCaller="bed")
+    experiment = dba(sampleSheet=experiment,peakCaller="bed")
   } 
   
   if(class(experiment)!="DBA") {
@@ -46,7 +46,7 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
         experiment = addMatchingSample(experiment,i,meta,samples)
       }
     }
-    experiment = dba(experiment,bCorPlot=FALSE)
+    experiment = dba(experiment)
   }
   
   if(missing(chromosomes)) {
