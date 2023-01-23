@@ -191,7 +191,7 @@ makeDistAndStrucSection <- function(object,covhistPlot,ccPlot){
                                               the relationship between Watson and Crick reads are presented. The metrics are the SSD metric and cross-coverage metrics,\
                                               Relative_CC and fragmentLength_CC.")
   
-  if(ccPlot != ""){
+  if(!is.null(ccPlot)){
     distAndStructureParagraph2 <- newParagraph(asStrong("SSD")," is the standard deviation of coverage normalised to\
                                                 the total number of reads. Evaluation of the number of bases at differing read depths,", asStrong("(figure 3)") ,"alongside\
                                                 the use of the SSD metric allow for an assessment of the distribution of ChIP-seq or input signal.") 
@@ -200,9 +200,6 @@ makeDistAndStrucSection <- function(object,covhistPlot,ccPlot){
                                                 and transcription factor ChIP-seq samples will show a higher proportion of genomic positions at greater depths and \
                                                 equivalence of sample and input SSD scores highlights either an unsuccessful ChIP or high levels of anomalous input signal                 
                                                 ")           
-  }else{
-    distAndStructureParagraph2<-""
-    distAndStructureParagraph3<-""
   }
   
   distAndStructureParagraph4 <- newParagraph("An important measure of ChIP successive is \
@@ -232,9 +229,20 @@ makeDistAndStrucSection <- function(object,covhistPlot,ccPlot){
   distAndStructureParagraph8 <- newParagraph(asStrong("Fragment Length CCov-")," (CCov of fragment length strand shift)/(Minimum CCov)")
   distAndStructureParagraph9 <- newParagraph(asStrong("Relative CCov-")," (CCov of fragment length strand shift)/(CCov of read length strand shift)")
   
-  distAndStructureSubSection <- addTo(distAndStructureSubSection,distAndStructureParagraph1,covhistPlot,
-                                      distAndStructureParagraph2,distAndStructureParagraph3,ccPlot,
-                                      distAndStructureParagraph4,distAndStructureParagraph5,distAndStructureParagraph5.1,distAndStructureParagraph5.2,
+  distAndStructureSubSection <- addTo(distAndStructureSubSection,
+                                      distAndStructureParagraph1,
+                                      covhistPlot)
+  if(!is.null(ccPlot)){
+    distAndStructureSubSection <- addTo(distAndStructureSubSection, 
+                                        distAndStructureParagraph2,
+                                        distAndStructureParagraph3,ccPlot)
+  }
+  
+  distAndStructureSubSection <- addTo(distAndStructureSubSection,
+                                      distAndStructureParagraph4,
+                                      distAndStructureParagraph5,
+                                      distAndStructureParagraph5.1,
+                                      distAndStructureParagraph5.2,
                                       distAndStructureParagraph6,
                                       newList(distAndStructureParagraph7,distAndStructureParagraph8,
                                               distAndStructureParagraph9))          
@@ -428,11 +436,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
   introductionSection <- makeIntroduction(object)
   summarySection <- makeSummarySection(object)
   mfdSubSection <- makeMFDSection(object,riblPlot,gfePlot)
-  if(has_ccp){
-    distAndStructureSubSection <- makeDistAndStrucSection(object,covhistPlot,ccPlot)
-  }else{
-    distAndStructureSubSection <- makeDistAndStrucSection(object,covhistPlot)
-  }
+  distAndStructureSubSection <- makeDistAndStrucSection(object,covhistPlot,ccPlot)
   peakProfileSubSection <- makePeakProfileSection(object,ripPlot,rapPlot,peakProfilePlot,peakCorHeatmap,peakPrinComp)
   versionSection <- makeSessionInfoSection()
   
