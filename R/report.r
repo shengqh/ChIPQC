@@ -405,7 +405,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
   if(sum(unlist(lapply(peaks(object),length)))>0) {
     cur_width=max(50 * nsample + 500, 2000)
     ggsave(plotFrip(object,facet=FALSE,facetBy=facetBy,addMetaData=addMetaData) + theme_bw3() + theme_rotate_x_axis_label() + xlab(""),filename=file.path(reportFolder,"Rip.png"), width=cur_width, height=1500, units="px", dpi=300)
-    ggsave(plotRap(object,facet=FALSE,facetBy=facetBy,addMetaData=addMetaData) + theme_bw3(),filename=file.path(reportFolder,"Rap.png"), width=cur_width, height=1500, units="px", dpi=300)
+    ggsave(plotRap(object,facet=FALSE,facetBy=facetBy,addMetaData=addMetaData) + theme_bw3() + theme_rotate_x_axis_label(),filename=file.path(reportFolder,"Rap.png"), width=cur_width, height=1500, units="px", dpi=300)
     ggsave(plotPeakProfile(object,facet=TRUE,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData) + theme_bw3(),filename=file.path(reportFolder,"PeakProfile.png"), width=width, height=height, units="px", dpi=300)
   }
   png(file.path(reportFolder,"PeakCorHeatmap.png"),width=2000,height=2000,res=300)
