@@ -373,7 +373,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
                         type = IMAGE.TYPE.RASTER, exportId = NULL,
                         protection = PROTECTION.PUBLIC)
   }else{
-    CCPlot <- NULL
+    ccPlot <- NULL
   }
 
   ggsave(plotCoverageHist(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData) + theme_bw3(),filename=file.path(reportFolder,"CoverageHistogramPlot.png"), width=width, height=height, units="px", dpi=300)
