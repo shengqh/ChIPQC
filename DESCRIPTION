@@ -1,4 +1,4 @@
-Package: ChIPQC
+Package: ChIPQC.SQH
 Type: Package
 Title: Quality metrics for ChIPseq data
 Version: 1.21.0.20230122
