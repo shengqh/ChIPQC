@@ -70,7 +70,7 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
   
   if(!missing(annotation)) {
     if(!is.null(annotation) && missing(samples)) {
-      if(class(annotation)!="list") {
+      if(!is.list(annotation)) {
         message('Compiling annotation...')
         annotation = getAnnotation(annotation,AllChr=chromosomes)
       }
@@ -80,7 +80,7 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
         blacklist = makeGRangesFromDataFrame(blacklist,ignore.strand=TRUE)
         message("Using default blacklist for hg19...")
       }
-    } else if(class(annotation)=="character") {
+    } else if(is.character(annotation)) {
       annotation = list(version=annotation)
     } else {
       annotation = list(version="none")

@@ -1,3 +1,17 @@
+theme_rotate_x_axis_label <- function() {
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+}
+
+
+theme_bw3 <- function() { 
+  theme_bw() +
+    theme(
+      strip.background = element_rect(fill = NA, colour = 'black'),
+      panel.border = element_rect(fill = NA, color = "black"),			
+      axis.line = element_line(colour = "black", size = 0.5)
+    )
+}
+
 makeIntroduction <- function(object){
   
   resultsSectionList <- newList(
@@ -177,14 +191,20 @@ makeDistAndStrucSection <- function(object,covhistPlot,ccPlot){
                                               the relationship between Watson and Crick reads are presented. The metrics are the SSD metric and cross-coverage metrics,\
                                               Relative_CC and fragmentLength_CC.")
   
-  distAndStructureParagraph2 <- newParagraph(asStrong("SSD")," is the standard deviation of coverage normalised to\
-                                              the total number of reads. Evaluation of the number of bases at differing read depths,", asStrong("(figure 3)") ,"alongside\
-                                              the use of the SSD metric allow for an assessment of the distribution of ChIP-seq or input signal.") 
+  if(ccPlot != ""){
+    distAndStructureParagraph2 <- newParagraph(asStrong("SSD")," is the standard deviation of coverage normalised to\
+                                                the total number of reads. Evaluation of the number of bases at differing read depths,", asStrong("(figure 3)") ,"alongside\
+                                                the use of the SSD metric allow for an assessment of the distribution of ChIP-seq or input signal.") 
+    
+    distAndStructureParagraph3 <- newParagraph("Successfull Histone \
+                                                and transcription factor ChIP-seq samples will show a higher proportion of genomic positions at greater depths and \
+                                                equivalence of sample and input SSD scores highlights either an unsuccessful ChIP or high levels of anomalous input signal                 
+                                                ")           
+  }else{
+    distAndStructureParagraph2<-""
+    distAndStructureParagraph3<-""
+  }
   
-  distAndStructureParagraph3 <- newParagraph("Successfull Histone \
-                                              and transcription factor ChIP-seq samples will show a higher proportion of genomic positions at greater depths and \
-                                              equivalence of sample and input SSD scores highlights either an unsuccessful ChIP or high levels of anomalous input signal                 
-                                              ")           
   distAndStructureParagraph4 <- newParagraph("An important measure of ChIP successive is \
                                               the degree to which Watson and Crick reads cluster around the centres\
                                               of transcription factor bindind sites or epigentic marks.                                                      ")           
@@ -302,25 +322,60 @@ setGeneric("ChIPQCreport", function(object="ChIPQCexperiment",facet=TRUE,
 
 setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
                                                        reportName="ChIPQC",reportFolder="ChIPQCreport",
-                                                       facetBy=c("Tissue","Factor","Condition","Treatment"),
+                                                       facetBy=c("Tissue","Factor","Condition", "Treatment"),
                                                        colourBy=c("Replicate"),
                                                        lineBy=NULL,
                                                        addMetaData=NULL
                                                        
 ){
   dir.create(reportFolder, showWarnings=FALSE)
+  object@DBA$class["Condition",]<-object@DBA$class["ID",]
   
-  ggsave(plotCC(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"CCPlot.png"))
-  ggsave(plotCoverageHist(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"CoverageHistogramPlot.png"))
-  ccPlot <- newFigure(file.path("CCPlot.png"),"Plot of CrossCoverage score after successive strand shifts",
-                      type = IMAGE.TYPE.RASTER, exportId = NULL,
-                      protection = PROTECTION.PUBLIC)
+  meta<-QCmetadata(object)
+
+  sample_meta<-subset(meta, Factor != "Control")
+  if(length(unique(sample_meta$Replicate)) == 1){
+    if("Replicate" %in% colourBy){
+      colourBy=colourBy[colourBy != "Replicate"]
+      if(length(colourBy) == 0){
+        colourBy=NULL
+      }
+    }
+  }
+  
+  nsample<-nrow(meta)
+  nwidth<-ceiling(sqrt(nsample))
+  nheight<-ceiling(nsample/nwidth)
+  width=nwidth * 1000
+  height=nheight * 1000
+  
+  oldFacetBy<-facetBy
+  facetBy<-c()
+  for(of in oldFacetBy){
+    if(length(unique(meta[,of])) > 1){
+      facetBy<-c(facetBy, of)
+    }
+  }
+  
+  ccp<-plotCC(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData)
+  has_ccp<-sum(!is.na(ccp))>0
+  if(has_ccp){
+    ggsave(ccp + theme_bw3(),filename=file.path(reportFolder,"CCPlot.png"), width=width, height=height, units="px", dpi=300)
+    ccPlot <- newFigure(file.path("CCPlot.png"),"Plot of CrossCoverage score after successive strand shifts",
+                        type = IMAGE.TYPE.RASTER, exportId = NULL,
+                        protection = PROTECTION.PUBLIC)
+  }else{
+    CCPlot <- NULL
+  }
+
+  ggsave(plotCoverageHist(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData) + theme_bw3(),filename=file.path(reportFolder,"CoverageHistogramPlot.png"), width=width, height=height, units="px", dpi=300)
   covhistPlot <- newFigure(file.path("CoverageHistogramPlot.png"),"Plot of the log2 base pairs of genome at differing read depths",
                            type = IMAGE.TYPE.RASTER, exportId = NULL,
                            protection = PROTECTION.PUBLIC)
   
   if(sum(!apply(is.na(regi(object)),2,sum)>0)>0) {
-    ggsave(plotRegi(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=1*length(QCsample(object)),width=16)
+    cur_height=max(1500, length(QCsample(object)) * 50 + 1000)
+    ggsave(plotRegi(object,facet=FALSE,facetBy=facetBy,addMetaData=addMetaData) + theme_bw3() + theme_rotate_x_axis_label(),filename=file.path(reportFolder,"GenomicFeatureEnrichment.png"),height=cur_height,width=2000, units="px", dpi=300)
     gfePlot <- newFigure(file.path("GenomicFeatureEnrichment.png"),"Heatmap of log2 enrichment of reads in genomic features",
                          type = IMAGE.TYPE.RASTER, exportId = NULL,
                          protection = PROTECTION.PUBLIC)
@@ -329,7 +384,7 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
   }
 
   if(sum(!is.na(ribl(object)))>0) {
-    ggsave(plotFribl(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Ribl.png"))
+    ggsave(plotFribl(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData) + theme_bw3(),filename=file.path(reportFolder,"Ribl.png"), width=2500, height=2500, units="px", dpi=300)
     
     riblPlot <- newFigure(file.path("Ribl.png"),"Barplot of the percentage of reads in blacklists",
                           type = IMAGE.TYPE.RASTER, exportId = NULL,
@@ -340,15 +395,16 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
   }
   
   if(sum(unlist(lapply(peaks(object),length)))>0) {
-    ggsave(plotFrip(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Rip.png"))
-    ggsave(plotRap(object,facet=facet,facetBy=facetBy,addMetaData=addMetaData),filename=file.path(reportFolder,"Rap.png"))
-    ggsave(plotPeakProfile(object,facet=facet,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData),filename=file.path(reportFolder,"PeakProfile.png"))
+    cur_width=max(50 * nsample + 500, 2000)
+    ggsave(plotFrip(object,facet=FALSE,facetBy=facetBy,addMetaData=addMetaData) + theme_bw3() + theme_rotate_x_axis_label() + xlab(""),filename=file.path(reportFolder,"Rip.png"), width=cur_width, height=1500, units="px", dpi=300)
+    ggsave(plotRap(object,facet=FALSE,facetBy=facetBy,addMetaData=addMetaData) + theme_bw3(),filename=file.path(reportFolder,"Rap.png"), width=cur_width, height=1500, units="px", dpi=300)
+    ggsave(plotPeakProfile(object,facet=TRUE,facetBy=facetBy,colourBy=colourBy,lineBy=lineBy,addMetaData=addMetaData) + theme_bw3(),filename=file.path(reportFolder,"PeakProfile.png"), width=width, height=height, units="px", dpi=300)
   }
-  png(file.path(reportFolder,"PeakCorHeatmap.png"),width=600,height=600)
-  plotCorHeatmap(object,attributes=c(facetBy,colourBy))
+  png(file.path(reportFolder,"PeakCorHeatmap.png"),width=2000,height=2000,res=300)
+  plotCorHeatmap(object,attributes=c("ID",colourBy))
   dev.off()
-  png(file.path(reportFolder,"PeakPCA.png"),width=600,height=600)
-  plotPrincomp(object,attributes=facetBy,label=colourBy)
+  png(file.path(reportFolder,"PeakPCA.png"),width=3000,height=2500,res=300)
+  plotPrincomp(object,attributes="ID",label=colourBy)
   dev.off()
   ripPlot <- newFigure(file.path("Rip.png"),"Barplot of the percentage number of reads in peaks",
                        type = IMAGE.TYPE.RASTER, exportId = NULL,
@@ -367,14 +423,16 @@ setMethod("ChIPQCreport", "ChIPQCexperiment", function(object,facet=TRUE,
                             protection = PROTECTION.PUBLIC)   
   
   
-  
-  
   qcreport <- newCustomReport( "ChIPQC Report" );
   
   introductionSection <- makeIntroduction(object)
   summarySection <- makeSummarySection(object)
   mfdSubSection <- makeMFDSection(object,riblPlot,gfePlot)
-  distAndStructureSubSection <- makeDistAndStrucSection(object,covhistPlot,ccPlot)
+  if(has_ccp){
+    distAndStructureSubSection <- makeDistAndStrucSection(object,covhistPlot,ccPlot)
+  }else{
+    distAndStructureSubSection <- makeDistAndStrucSection(object,covhistPlot)
+  }
   peakProfileSubSection <- makePeakProfileSection(object,ripPlot,rapPlot,peakProfilePlot,peakCorHeatmap,peakPrinComp)
   versionSection <- makeSessionInfoSection()
   

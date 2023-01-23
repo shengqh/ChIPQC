@@ -54,11 +54,11 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
   txdb <- NULL
   GeneAnnotationTotalSizes <- NULL
 
-  if(class(GeneAnnotation)!="list" & !is.null(GeneAnnotation)) {
+  if(!is.list(GeneAnnotation) & !is.null(GeneAnnotation)) {
     GeneAnnotation = getAnnotation(GeneAnnotation,AllChr=names(ChrLengths))
     
   }
-  if(class(GeneAnnotation)=="list"){
+  if(is.list(GeneAnnotation)){
     if(length(GeneAnnotation)>1) {
       GeneAnnotation <- GeneAnnotation[!names(GeneAnnotation) %in% "version"]
       GeneAnnotation <- lapply(GeneAnnotation,function(x)reduce(GetGRanges(x,names(ChrLengths))))
@@ -193,7 +193,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
       }else{
         SSDBL <- NULL
       }
-      if(class(GeneAnnotation)=="list"){
+      if(is.list(GeneAnnotation)){
         #GRangesOfInterestListGA <- GRangesList()
         noVersionGeneAnnotation <- GeneAnnotation[!names(GeneAnnotation)=="version"]
         GRangesOfInterestListGF <- GRangesList()
@@ -324,7 +324,7 @@ sampleQC <- function(bamFile,bedFile=NULL,blklist=NULL,ChrOfInterest=NULL,GeneAn
     SSDBLAv <- as.numeric(NA)     
   }   
   
-  if(class(GeneAnnotation)=="list" & !is.null(GFCountsMatrix)){
+  if(is.list(GeneAnnotation) & !is.null(GFCountsMatrix)){
     #CountsInFeatures <-vector("list",length=ncol(GFCountsMatrix))
     CountsInFeatures <- as.list(apply(GFCountsMatrix,2,function(x)sum(x,na.rm=TRUE)))
     names(CountsInFeatures) <- colnames(GFCountsMatrix)
@@ -429,9 +429,9 @@ GetGRanges <- function(LoadFile,AllChr=NULL,ChrOfInterest=NULL,simple=FALSE,sepr
       RegionRanges <- GRanges(seqnames(RegionRanges),ranges(RegionRanges))
     }
   }else{
-    if(class(LoadFile) == "character"){
+    if(is.character(LoadFile)){
       RangesTable <- read.delim(LoadFile,sep=sepr,header=TRUE,comment.char="#")
-    }else if(class(LoadFile) == "matrix"){
+    }else if(is.matrix(LoadFile)){
       RangesTable <- as.data.frame(LoadFile)
     } else{
       RangesTable <- as.data.frame(LoadFile)

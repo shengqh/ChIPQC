@@ -3,7 +3,7 @@
 ## Utility
 mergeMetadata <- function(object,addMetaData,facetBy,colourBy,lineBy){
   metadata <- QCmetadata(object)
-  if(!is.null(addMetaData) & class(addMetaData)=="data.frame"){
+  if(!is.null(addMetaData) & is.data.frame(addMetaData)){
     metadata <- merge(metadata,addMetaData,by.x=1,by.y=1,all.x=TRUE,all.y=FALSE)
   }
   if(all(facetBy %in% c("Sample",colnames(metadata)))){
@@ -64,6 +64,9 @@ setMethod("plotCC", "ChIPQCexperiment", function(object,method="Coverage",facet=
 ){
   
   ccvector <- crosscoverage(object)
+  if((all(is.na(ccvector)))){
+    return(NULL)
+  }
   readlen <- max(readlength(object))
   shiftlength <- nrow(ccvector)
   

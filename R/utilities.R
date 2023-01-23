@@ -6,7 +6,7 @@ listadd = function(a,b){
 }
 
 list2matrix = function(vlist,bNAasZero=TRUE) {
-   if(class(vlist)=="list"){
+   if(is.list(vlist)){
       maxlen = max(sapply(vlist,length))
       vlist = lapply(vlist,function(x){extend(x,maxlen,bNAasZero)})
       res = matrix(0,maxlen,length(vlist))
