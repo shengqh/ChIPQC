@@ -25,7 +25,7 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
                   profileWin=400,fragmentLength=125,shifts=1:300,...) {
   
   if(class(experiment)=="character" || class(experiment)=="data.frame") {
-    experiment = dba(sampleSheet=experiment,peakCaller="bed")
+    experiment = dba(sampleSheet=experiment, minOverlap = 1, peakCaller="bed")
   } 
   
   if(class(experiment)!="DBA") {
@@ -187,10 +187,10 @@ ChIPQC = function(experiment, annotation, chromosomes, samples,
   if(bCount) {
     message('Counting reads in consensus peakset...')
     if(!is.null(peaks)) {
-      experiment = dba.count(experiment,peaks=peaks,mapQCth=mapQCth,...)    
+      experiment = dba.count(experiment,minOverlap = 1,peaks=peaks,mapQCth=mapQCth,...)    
       meta = data.frame(t(experiment$class))
     } else {
-      experiment = dba.count(experiment,mapQCth=mapQCth,...)   
+      experiment = dba.count(experiment,minOverlap = 1,mapQCth=mapQCth,...)   
       meta = data.frame(t(experiment$class))
     }
     if(nrow(meta) != length(samplelist)) {
